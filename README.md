@@ -2,6 +2,8 @@
 
 > **Rise In — Stellar Journey to Mastery | 🟢 Green Belt (Level 4) Submission**
 
+![CI/CD Pipeline](https://github.com/Om12345-ingle/ai-wallet-manager/actions/workflows/ci.yml/badge.svg)
+
 An AI-powered wallet management application built on the **Stellar blockchain**, enabling users to manage multi-asset portfolios, execute token swaps, set smart contract spending limits, and interact with their wallet using natural language commands.
 
 ---
