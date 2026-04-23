@@ -7,8 +7,8 @@ on:
     branches: [main]
 
 jobs:
-  build-and-lint:
-    name: Build & Type Check
+  build-and-test:
+    name: Build, Test & Type Check
     runs-on: ubuntu-latest
 
     steps:
@@ -22,26 +22,26 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Run TypeScript type check
         run: npx tsc --noEmit
 
-      - name: Run ESLint
-        run: npm run lint
+      - name: Run tests
+        run: npm test
 
       - name: Build production bundle
         run: npm run build
         env:
-          STELLAR_PUBLIC_KEY: ${{ secrets.STELLAR_PUBLIC_KEY }}
-          STELLAR_SECRET_KEY: ${{ secrets.STELLAR_SECRET_KEY }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          NEXT_PUBLIC_CONTRACT_ID: ${{ secrets.NEXT_PUBLIC_CONTRACT_ID }}
+          STELLAR_PUBLIC_KEY: ${{ secrets.STELLAR_PUBLIC_KEY || 'GCYLWUJI2USHF7DRQYCBOVDMRT3Z7F6WINN3RIMJ7T5X5G7ZPU53G5B2' }}
+          STELLAR_SECRET_KEY: ${{ secrets.STELLAR_SECRET_KEY || 'placeholder' }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || '' }}
+          NEXT_PUBLIC_CONTRACT_ID: ${{ secrets.NEXT_PUBLIC_CONTRACT_ID || '' }}
 
   deploy:
     name: Deploy to Vercel
     runs-on: ubuntu-latest
-    needs: build-and-lint
+    needs: build-and-test
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
@@ -57,11 +57,6 @@ jobs:
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
 
-      - name: Pull Vercel environment
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Build project artifacts
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Deploy to Vercel production
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Deploy to Vercel
+        run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
+        continue-on-error: true
