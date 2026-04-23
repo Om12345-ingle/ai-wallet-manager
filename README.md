@@ -12,6 +12,58 @@ An AI-powered wallet management application built on the **Stellar blockchain**,
 
 ---
 
+## ✅ Tests — 52 Passing
+
+```
+ PASS  __tests__/command-parser.test.ts
+ PASS  __tests__/stellar-utils.test.ts
+ PASS  __tests__/wallet-api.test.ts
+
+Test Suites: 3 passed, 3 total
+Tests:       52 passed, 52 total
+Snapshots:   0 total
+Time:        4.737 s
+```
+
+**Test coverage:**
+- `command-parser.test.ts` — 28 tests: greetings, balance, portfolio, swap, send, security, prices, history
+- `stellar-utils.test.ts` — 15 tests: keypair generation, address validation, asset creation, amount formatting
+- `wallet-api.test.ts` — 9 tests: live Stellar Testnet account, transactions, Horizon API
+
+Run tests locally:
+```bash
+npm test
+```
+
+---
+
+## 🔗 On-Chain Activity (Stellar Testnet)
+
+**Wallet Address:**
+```
+GCYLWUJI2USHF7DRQYCBOVDMRT3Z7F6WINN3RIMJ7T5X5G7ZPU53G5B2
+```
+
+**Funding Transaction (Friendbot):**
+```
+6ee7e9670e3d7c2b2d9e40aa7fd2813d49f17a6becddac7788f823e7f16bf7fe
+```
+🔍 [View on Stellar Expert](https://stellar.expert/explorer/testnet/tx/6ee7e9670e3d7c2b2d9e40aa7fd2813d49f17a6becddac7788f823e7f16bf7fe)
+
+**Network:** Stellar Testnet (Horizon: `https://horizon-testnet.stellar.org`)
+
+**Supported Assets & Issuers:**
+
+| Asset | Issuer |
+|---|---|
+| XLM | Native |
+| USDC | `GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5` |
+| EURC | `GDHU6WRG4IEQXM5NZ4BMPKOXHW76MZM4Y2IEMFDVXBSDP6SJY4ITNPP2` |
+| AQUA | `GBNZILSTVQZ4R7IKQDGHYGY2QXL5QOFJYQMXPKWRRM5PAV7Y4M67AQUA` |
+| YBX | `GBUYUAI75XXWDZEKLY66CFYKQPET5JR4EENXZBUZ3YXZ7DS56Z4OKOFU` |
+
+---
+
 ## 📋 Table of Contents
 
 - [Overview](#overview)
