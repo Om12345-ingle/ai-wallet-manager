@@ -20,7 +20,7 @@ export default function ChatInterface() {
   
   const getDefaultWelcomeMessage = (): Message => ({
     id: '1',
-    text: 'Hi! I\'m your advanced AI wallet assistant! 🤖✨ I understand natural language, so just talk to me normally!\n\n🗣️ **Talk Naturally - Try These:**\n• "How much money do I have?"\n• "Send some stellar to Alice"\n• "Swap half my lumens for dollars"\n• "Is my wallet safe right now?"\n• "What\'s my USDC worth in XLM?"\n\n🧠 **I\'m Smart About:**\n• **Typos**: "XML" → I know you mean XLM\n• **Aliases**: "stellar/lumens" = XLM, "dollars" = USDC\n• **Amounts**: "half", "all", "some", "10%"\n• **Context**: I remember our conversation\n• **Safety**: I\'ll ask before risky actions\n\n💡 **Advanced Examples:**\n• "Lock everything down!" (emergency freeze)\n• "Trade some aqua tokens for euros"\n• "Can you check if I have enough to send 100 XLM?"\n• "What should I do to make my wallet safer?"\n\nJust speak naturally - I\'ll figure out what you want! 🚀',
+    text: 'Hey! 👋 I\'m your AI wallet assistant powered by Gemini. Just talk to me naturally!\n\n💬 **Try saying:**\n• "What\'s my balance?"\n• "Send 10 XLM to Alice"\n• "Swap 50 XLM to USDC"\n• "Show my portfolio"\n• "Freeze my wallet"\n• "Set daily limit to 500 XLM"\n• "List my contacts"\n• "What are current prices?"\n\nI understand natural language — no need for exact commands. Just say what you want! 🚀',
     isUser: false,
     timestamp: new Date()
   })
@@ -935,7 +935,7 @@ export default function ChatInterface() {
         body: JSON.stringify({ 
           command: userMessage,
           publicKey,
-          context
+          contacts: contacts.map(c => c.name)
         })
       })
 

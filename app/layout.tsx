@@ -10,6 +10,7 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'AI Wallet Manager',
   description: 'Stellar wallet with AI-powered natural language commands',
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
 }
 
 export default function RootLayout({

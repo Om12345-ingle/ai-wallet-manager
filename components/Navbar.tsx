@@ -10,6 +10,8 @@ interface NavbarProps {
 
 const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: '🏠' },
+  { id: 'chat', label: 'AI Chat', icon: '🤖' },
+  { id: 'contacts', label: 'Contacts', icon: '👥' },
   { id: 'spending', label: 'Spending Limits', icon: '💰' },
   { id: 'security', label: 'Security', icon: '🔒' },
   { id: 'contracts', label: 'Smart Contracts', icon: '📋' },
