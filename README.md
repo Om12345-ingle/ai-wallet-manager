@@ -13,7 +13,8 @@ An AI-powered wallet management application built on the **Stellar blockchain**,
 **[https://omyaingle-patd1nve9-neelpote44-7832s-projects.vercel.app](https://omyaingle-patd1nve9-neelpote44-7832s-projects.vercel.app)**
 
 ---
-
+google form link - https://forms.gle/fMs7FT5DjqDAZEbp6
+google docs link - https://docs.google.com/spreadsheets/d/1Fy0MHt8JeNQrlyHyKJqUPEF3bupMbKvlBDsOAh3Yy44/edit?usp=sharing
 ## 📋 Reviewer Feedback & Fixes
 
 > 📊 [Full Review Sheet](https://docs.google.com/spreadsheets/d/1Fy0MHt8JeNQrlyHyKJqUPEF3bupMbKvlBDsOAh3Yy44/edit?usp=sharing)
