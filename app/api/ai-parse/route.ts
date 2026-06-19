@@ -351,64 +351,222 @@ async function parseWithOllama(command: string, contacts: string[], modelName: s
 // ── Main API Route POST handler ───────────────────────────────────────────────
 export async function POST(request: NextRequest) {
   try {
-    const { command, contacts = [] } = await request.json();
+    const { command, contacts = [], balance = "0", spendingInfo = null } = await request.json();
 
     if (!command?.trim()) {
       return NextResponse.json({ error: 'Command is required' }, { status: 400 });
     }
 
+    let parseResult: any = null;
+    let providerUsed = '';
+
     // 1. Try fast regex parser first (immediate, no cost)
     const fast = parseCommandFast(command);
     if (fast) {
       console.log(`[AI Parser] Fast Regex match:`, fast.action);
-      return NextResponse.json({ ...fast, confidence: 1.0, source: 'regex' });
-    }
-
-    // 2. Try configured LLM providers in waterfall sequence
-    let aiResult: any = null;
-    let providerUsed = '';
-
-    try {
-      if (process.env.OPENAI_API_KEY) {
-        console.log(`[AI Parser] Attempting OpenAI...`);
-        aiResult = await parseWithOpenAI(command, contacts, process.env.OPENAI_API_KEY);
-        providerUsed = 'openai';
-      } else if (process.env.GROQ_API_KEY) {
-        console.log(`[AI Parser] Attempting Groq...`);
-        aiResult = await parseWithGroq(command, contacts, process.env.GROQ_API_KEY);
-        providerUsed = 'groq';
-      } else if (process.env.GEMINI_API_KEY && genAI) {
-        console.log(`[AI Parser] Attempting Gemini...`);
-        aiResult = await parseWithGemini(command, contacts);
-        providerUsed = 'gemini';
-      } else if (process.env.OLLAMA_MODEL) {
-        console.log(`[AI Parser] Attempting local Ollama (${process.env.OLLAMA_MODEL})...`);
-        aiResult = await parseWithOllama(command, contacts, process.env.OLLAMA_MODEL);
-        providerUsed = 'ollama';
+      parseResult = fast;
+      providerUsed = 'regex';
+    } else {
+      // 2. Try configured LLM providers in waterfall sequence
+      try {
+        if (process.env.OPENAI_API_KEY) {
+          console.log(`[AI Parser] Attempting OpenAI...`);
+          parseResult = await parseWithOpenAI(command, contacts.map((c: any) => typeof c === 'string' ? c : c.name), process.env.OPENAI_API_KEY);
+          providerUsed = 'openai';
+        } else if (process.env.GROQ_API_KEY) {
+          console.log(`[AI Parser] Attempting Groq...`);
+          parseResult = await parseWithGroq(command, contacts.map((c: any) => typeof c === 'string' ? c : c.name), process.env.GROQ_API_KEY);
+          providerUsed = 'groq';
+        } else if (process.env.GEMINI_API_KEY && genAI) {
+          console.log(`[AI Parser] Attempting Gemini...`);
+          parseResult = await parseWithGemini(command, contacts.map((c: any) => typeof c === 'string' ? c : c.name));
+          providerUsed = 'gemini';
+        } else if (process.env.OLLAMA_MODEL) {
+          console.log(`[AI Parser] Attempting local Ollama (${process.env.OLLAMA_MODEL})...`);
+          parseResult = await parseWithOllama(command, contacts.map((c: any) => typeof c === 'string' ? c : c.name), process.env.OLLAMA_MODEL);
+          providerUsed = 'ollama';
+        }
+      } catch (llmError: any) {
+        console.error(`[AI Parser] LLM Provider error (${providerUsed || 'unknown'}):`, llmError.message);
       }
-    } catch (llmError: any) {
-      console.error(`[AI Parser] LLM Provider error (${providerUsed || 'unknown'}):`, llmError.message);
-      // Let it fall back to heuristics instead of crashing
-    }
 
-    // 3. Heuristic / Local NLP Fallback (Runs if no LLM configured OR LLM call failed)
-    if (!aiResult) {
-      console.log(`[AI Parser] Fallback: running local heuristic parser...`);
-      aiResult = parseCommandHeuristics(command, contacts);
-      providerUsed = 'local-heuristics';
+      // 3. Heuristic / Local NLP Fallback (Runs if no LLM configured OR LLM call failed)
+      if (!parseResult) {
+        console.log(`[AI Parser] Fallback: running local heuristic parser...`);
+        parseResult = parseCommandHeuristics(command, contacts.map((c: any) => typeof c === 'string' ? c : c.name));
+        providerUsed = 'local-heuristics';
+      }
     }
 
     // 4. Return result if classified successfully
-    if (aiResult && aiResult.action !== 'unknown') {
-      console.log(`[AI Parser] Success using ${providerUsed}:`, aiResult.action);
-      return NextResponse.json({ ...aiResult, confidence: providerUsed === 'local-heuristics' ? 0.8 : 0.9, source: providerUsed });
+    if (parseResult && parseResult.action !== 'unknown') {
+      console.log(`[AI Parser] Success using ${providerUsed}:`, parseResult.action);
+      
+      const responsePayload: any = {
+        ...parseResult,
+        confidence: providerUsed === 'local-heuristics' ? 0.8 : (providerUsed === 'regex' ? 1.0 : 0.9),
+        source: providerUsed
+      };
+
+      // Inject Guardrail analysis if transaction requires confirmation
+      if (parseResult.requiresConfirmation) {
+        // Normalize contacts
+        const normalizedContacts = contacts.map((c: any) => {
+          if (typeof c === 'string') return { name: c.toLowerCase(), address: '' };
+          return { name: c.name?.toLowerCase() || '', address: c.address || '' };
+        });
+
+        const checks = [];
+        const numAmount = parseResult.amount ? parseFloat(parseResult.amount) : 0;
+        const numBalance = balance ? parseFloat(balance) : 0;
+
+        // 1. Wallet Frozen Check
+        if (spendingInfo) {
+          if (spendingInfo.isFrozen) {
+            checks.push({
+              name: 'Wallet Status',
+              passed: false,
+              status: 'fail',
+              msg: '🚫 Wallet is currently frozen. Outgoing transactions are blocked.'
+            });
+          } else {
+            checks.push({
+              name: 'Wallet Status',
+              passed: true,
+              status: 'pass',
+              msg: '✅ Wallet is active and secure.'
+            });
+          }
+        }
+
+        // 2. Balance Verification
+        if (parseResult.action === 'send' || parseResult.action === 'send_to_contact' || parseResult.action === 'swap_tokens') {
+          if (numAmount > numBalance) {
+            checks.push({
+              name: 'Funds Check',
+              passed: false,
+              status: 'fail',
+              msg: `❌ Insufficient balance. Trying to use ${numAmount} XLM but you only have ${numBalance} XLM.`
+            });
+          } else if (numAmount > numBalance * 0.5) {
+            checks.push({
+              name: 'Funds Check',
+              passed: true,
+              status: 'warn',
+              msg: `⚠️ High Exposure: This transaction uses ${Math.round((numAmount / numBalance) * 100)}% of your total balance.`
+            });
+          } else {
+            checks.push({
+              name: 'Funds Check',
+              passed: true,
+              status: 'pass',
+              msg: '✅ Sufficient funds available.'
+            });
+          }
+        }
+
+        // 3. Contact Safety Verification
+        if (parseResult.action === 'send') {
+          const matched = normalizedContacts.find((c: any) => c.address === parseResult.recipient);
+          if (matched) {
+            checks.push({
+              name: 'Recipient Identity',
+              passed: true,
+              status: 'pass',
+              msg: `✅ Verified: Recipient is in your contacts as "${matched.name}".`
+            });
+          } else {
+            checks.push({
+              name: 'Recipient Identity',
+              passed: true,
+              status: 'warn',
+              msg: '⚠️ Unknown Address: This recipient is not in your saved contacts list.'
+            });
+          }
+        } else if (parseResult.action === 'send_to_contact') {
+          const matched = normalizedContacts.find((c: any) => c.name === parseResult.contactName);
+          if (matched) {
+            checks.push({
+              name: 'Recipient Identity',
+              passed: true,
+              status: 'pass',
+              msg: `✅ Verified: Contact "${parseResult.contactName}" exists.`
+            });
+          } else {
+            checks.push({
+              name: 'Recipient Identity',
+              passed: false,
+              status: 'warn',
+              msg: `⚠️ Contact Not Found: "${parseResult.contactName}" is not saved. Ensure correct spelling.`
+            });
+          }
+        }
+
+        // 4. Daily Spending Limit Check
+        if (spendingInfo && (parseResult.action === 'send' || parseResult.action === 'send_to_contact' || parseResult.action === 'swap_tokens')) {
+          const remaining = spendingInfo.dailyLimit - spendingInfo.dailySpent;
+          if (numAmount > remaining) {
+            checks.push({
+              name: 'Spending Limit',
+              passed: false,
+              status: 'fail',
+              msg: `🚫 Exceeds Daily Limit: Daily limit remaining is ${remaining.toFixed(2)} XLM (Tried ${numAmount} XLM).`
+            });
+          } else {
+            checks.push({
+              name: 'Spending Limit',
+              passed: true,
+              status: 'pass',
+              msg: `✅ Within Daily Limit: ${remaining.toFixed(2)} XLM remaining for today.`
+            });
+          }
+        }
+
+        // Generate conversational ELI5 explanation
+        let eli5 = '';
+        if (genAI && providerUsed === 'gemini') {
+          try {
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+            const prompt = `You are a helpful Stellar wallet assistant. Write a short, friendly, reassuring explanation in one sentence of this parsed transaction action: ${JSON.stringify(parseResult)}. E.g., "You are about to swap 10 XLM into USDC." or "This will trigger a lockdown on your wallet."`;
+            const result = await model.generateContent(prompt);
+            eli5 = result.response.text().trim();
+          } catch (e) {
+            console.warn("Failed to generate ELI5 with Gemini:", e);
+          }
+        }
+
+        if (!eli5) {
+          // Template fallbacks
+          if (parseResult.action === 'send' || parseResult.action === 'send_to_contact') {
+            const recipientStr = parseResult.contactName ? parseResult.contactName : (parseResult.recipient ? `${parseResult.recipient.slice(0, 8)}...` : 'recipient');
+            eli5 = `You are sending ${numAmount} ${parseResult.fromAsset || 'XLM'} to ${recipientStr}. It will confirm on-chain in seconds.`;
+          } else if (parseResult.action === 'swap_tokens') {
+            eli5 = `You are swapping ${numAmount} ${parseResult.fromAsset} for ${parseResult.toAsset}. This executes immediately on the Stellar DEX.`;
+          } else if (parseResult.action === 'freeze_wallet') {
+            eli5 = `This will temporarily freeze your wallet. Outgoing transfers will be blocked until unfrozen.`;
+          } else if (parseResult.action === 'unfreeze_wallet') {
+            eli5 = `This will unlock your wallet and restore normal transaction permissions.`;
+          } else {
+            eli5 = `You are confirming a ${parseResult.action.replace('_', ' ')} action.`;
+          }
+        }
+
+        responsePayload.guardrails = {
+          eli5,
+          fee: '0.00001 XLM',
+          speed: '~3-5 seconds',
+          checks
+        };
+      }
+
+      return NextResponse.json(responsePayload);
     }
 
     // 5. If completely unknown or unparseable, return suggestions
     const suggestions = [
       '"What\'s my balance?"',
       '"Show my portfolio"',
-      '"Swap 10 XLM to USDC"',
+      '"Swap 100 XLM to USDC"',
       '"Send 5 XLM to Alice"',
       '"Freeze my wallet"',
       '"Set daily limit to 500 XLM"',
@@ -418,7 +576,7 @@ export async function POST(request: NextRequest) {
 
     console.log(`[AI Parser] Command could not be parsed: "${command}"`);
     return NextResponse.json({
-      error: aiResult?.message || `I didn't understand "${command}"`,
+      error: parseResult?.message || `I didn't understand "${command}"`,
       suggestions
     }, { status: 400 });
 

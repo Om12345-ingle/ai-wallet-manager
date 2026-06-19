@@ -119,13 +119,13 @@ export default function WalletLoginForm() {
     <div className="space-y-8">
       {/* Header */}
       <div className="text-center">
-        <h3 className="text-3xl font-bold text-white mb-4">Connect Your Wallet</h3>
-        <p className="text-xl text-gray-400">Choose how you'd like to connect to Stellar testnet</p>
+        <h3 className="text-3xl font-extrabold text-white mb-4 tracking-tight">Connect Your Wallet</h3>
+        <p className="text-base text-gray-400 max-w-md mx-auto">Choose how you'd like to authenticate with the Stellar Testnet</p>
       </div>
 
       {error && (
-        <div className="p-4 rounded-xl bg-red-500/10 border border-red-400/30 text-red-300 text-center">
-          <p>{error}</p>
+        <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-300 text-center animate-fade-in-scale font-medium">
+          ⚠️ {error}
         </div>
       )}
 
@@ -135,18 +135,24 @@ export default function WalletLoginForm() {
         <button
           onClick={quickStart}
           disabled={connecting}
-          className="p-8 rounded-2xl border transition-all duration-300 hover:scale-105 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-green-400/30 hover:border-green-400/50"
+          className="p-8 rounded-3xl border transition-all duration-500 hover:scale-[1.02] bg-gradient-to-br from-white/10 via-green-500/5 to-black/30 border-green-500/30 hover:border-green-500/50 shadow-lg relative group overflow-hidden"
         >
-          <div className="text-center">
-            <div className="text-5xl mb-4">⚡</div>
-            <h4 className="text-2xl font-bold text-white mb-2">Quick Start</h4>
-            <p className="text-gray-400 mb-4">
-              Generate new testnet keys and connect instantly
+          <div className="absolute inset-0 bg-green-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <div className="text-center relative z-10">
+            <div className="text-5xl mb-4 animate-bounce" style={{ animationDuration: '3s' }}>⚡</div>
+            <h4 className="text-2xl font-bold text-white mb-2 tracking-tight">Quick Start</h4>
+            <p className="text-gray-400 mb-4 max-w-sm mx-auto text-sm leading-relaxed">
+              Generate new testnet credentials and connect your dashboard instantly.
             </p>
             {connecting ? (
-              <div className="text-green-400">Generating keys...</div>
+              <div className="text-green-400 font-semibold flex items-center justify-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-green-400 animate-ping"></span>
+                Generating Secure Credentials...
+              </div>
             ) : (
-              <div className="text-green-400 font-semibold">Recommended for testing</div>
+              <div className="inline-block text-xs px-3 py-1 rounded-full bg-green-500/20 text-green-300 border border-green-500/30 font-bold uppercase tracking-wider">
+                ⚡ Recommended for Sandbox Testing
+              </div>
             )}
           </div>
         </button>
@@ -155,89 +161,90 @@ export default function WalletLoginForm() {
         <button
           onClick={tryFreighter}
           disabled={connecting}
-          className="p-6 rounded-2xl border transition-all duration-300 hover:scale-105 bg-gradient-to-r from-white/10 to-black/10 border-white/20 hover:border-white/40"
+          className="p-6 rounded-3xl border transition-all duration-300 hover:scale-[1.02] bg-gradient-to-r from-white/5 via-black/10 to-white/5 border-white/15 hover:border-white/30 hover:bg-white/10 shadow-md flex items-center justify-between group"
         >
           <div className="flex items-center gap-4">
-            <div className="text-4xl">🚀</div>
+            <div className="text-4xl group-hover:scale-110 transition-transform duration-300">🚀</div>
             <div className="flex-1 text-left">
-              <h4 className="text-xl font-semibold text-white">Freighter Wallet</h4>
-              <p className="text-gray-400">
-                {connecting ? 'Connecting...' : 'Secure browser extension wallet'}
+              <h4 className="text-lg font-bold text-white">Freighter Wallet</h4>
+              <p className="text-sm text-gray-400">
+                {connecting ? 'Checking status...' : 'Authorize using your Freighter browser extension'}
               </p>
             </div>
-            <div className="text-white/60">
-              {connecting ? '⏳' : '→'}
-            </div>
+          </div>
+          <div className="text-white/60 text-lg group-hover:translate-x-1 transition-transform duration-300">
+            {connecting ? '⏳' : '→'}
           </div>
         </button>
 
         {/* Manual Entry */}
-        <div className="kiro-card space-y-6">
+        <div className={`kiro-card space-y-6 transition-all duration-500 border ${publicKey && secretKey ? 'glow-green' : 'border-white/10'}`}>
           <div className="text-center">
-            <div className="text-4xl mb-4">🔑</div>
-            <h4 className="text-xl font-semibold text-white mb-2">Manual Entry</h4>
-            <p className="text-gray-400">Enter your Stellar testnet keys</p>
+            <div className="text-4xl mb-3">🔑</div>
+            <h4 className="text-xl font-bold text-white mb-1">Manual Account Entry</h4>
+            <p className="text-sm text-gray-400">Authenticate with existing Stellar keys</p>
           </div>
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-white mb-2">
-                Public Key
+              <label className="block text-xs font-bold text-gray-300 mb-2 uppercase tracking-wider">
+                Public Key (Address)
               </label>
               <input
                 type="text"
                 value={publicKey}
                 onChange={(e) => setPublicKey(e.target.value)}
                 placeholder="GXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-                className="kiro-input text-sm font-mono"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white font-mono text-xs focus:outline-none focus:border-white/30 transition-all duration-300"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-white mb-2">
-                Secret Key
+              <label className="block text-xs font-bold text-gray-300 mb-2 uppercase tracking-wider">
+                Secret Seed Key
               </label>
               <input
                 type="password"
                 value={secretKey}
                 onChange={(e) => setSecretKey(e.target.value)}
                 placeholder="SXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-                className="kiro-input text-sm font-mono"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white font-mono text-xs focus:outline-none focus:border-white/30 transition-all duration-300"
               />
             </div>
           </div>
 
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 pt-2">
             <button
               onClick={connectWallet}
               disabled={!publicKey || !secretKey || connecting}
-              className="flex-1 kiro-btn kiro-btn-primary hover:scale-105 transition-transform duration-300"
+              className="flex-1 py-3 px-6 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-white font-bold text-sm transition-all duration-300 hover:scale-105 active:scale-95 disabled:opacity-50"
             >
-              <span className="mr-2">🚀</span>
-              Connect Wallet
+              🚀 Connect Credentials
             </button>
             <button
               onClick={generateKeys}
               disabled={connecting}
-              className="kiro-btn kiro-btn-ghost hover:scale-105 transition-transform duration-300"
+              className="py-3 px-6 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold text-sm transition-all duration-300 hover:scale-105 active:scale-95"
             >
-              <span className="mr-2">🎲</span>
-              Generate Keys
+              🎲 Generate New Pair
             </button>
           </div>
         </div>
       </div>
 
-      {/* Info Section */}
+      {/* Sandbox Info */}
       <div className="text-center">
-        <div className="kiro-card p-6">
-          <div className="flex items-center gap-3 justify-center mb-4">
-            <div className="w-3 h-3 rounded-full bg-white/60 animate-pulse-glow"></div>
-            <p className="font-semibold text-white">🧪 Testnet Environment</p>
+        <div className="kiro-card p-6 border border-white/10 bg-gradient-to-b from-white/5 to-black/30">
+          <div className="flex items-center gap-3 justify-center mb-3">
+            <div className="relative">
+              <span className="w-3.5 h-3.5 rounded-full bg-cyan-400 block animate-pulse"></span>
+              <span className="absolute inset-0 w-3.5 h-3.5 rounded-full bg-cyan-400 animate-ping opacity-75"></span>
+            </div>
+            <p className="font-bold text-sm text-white tracking-wide uppercase">🧪 Sandbox Environment</p>
           </div>
-          <p className="text-gray-300">
-            This application uses Stellar's testnet for safe development and testing. 
-            All transactions use test XLM with no real value.
+          <p className="text-xs text-gray-400 leading-relaxed max-w-xl mx-auto">
+            This app is connected exclusively to the Stellar Testnet. 
+            All funds are mock XLM issued by Friendbot and hold no real monetary value.
           </p>
         </div>
       </div>

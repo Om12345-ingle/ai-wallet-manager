@@ -8,12 +8,22 @@ An AI-powered wallet management application built on the **Stellar blockchain**,
 
 ---
 
+> [!NOTE]
+> ### 🚀 ADVANCED UPGRADE: Interactive Charts & AI Safety Guardrails
+> We have added next-level visual analytics and visual guardrail audits to provide a premium wallet experience:
+> 
+> *   **Interactive SVG Donut Chart:** A custom, low-latency, responsive SVG asset allocation chart. Hovering over slices dynamically displays real-time balances, assets value in XLM, and USD equivalents inside the center of the ring.
+> *   **Concentric Limit Progress Rings:** Side-by-side circular indicators visualizing the utilization percentage of your smart-contract daily and monthly limits with glowing thresholds.
+> *   **Activity Flow Line Graph:** A custom SVG area chart mapping your last 10 transactions with interactive hovered points showing XLM transaction volume trends.
+> *   **AI-Driven Safety Guardrail Cards:** Rich security confirmation panels directly inside the AI Chat window checking destination address contacts trust, transaction exposure risks, limit caps, and wallet freeze locks, coupled with Gemini-powered ELI5 (Explain Like I'm 5) details.
+
+---
+
 ## 🌐 Live Demo
 
 **[https://omyaingle-patd1nve9-neelpote44-7832s-projects.vercel.app](https://omyaingle-patd1nve9-neelpote44-7832s-projects.vercel.app)**
 
 ---
-google form link - https://forms.gle/fMs7FT5DjqDAZEbp6
 google docs link - https://docs.google.com/spreadsheets/d/1Fy0MHt8JeNQrlyHyKJqUPEF3bupMbKvlBDsOAh3Yy44/edit?usp=sharing
 ## 📋 Reviewer Feedback & Fixes
 

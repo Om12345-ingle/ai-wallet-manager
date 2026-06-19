@@ -565,3 +565,93 @@ body {
     0 20px 40px rgba(0, 0, 0, 0.3),
     0 0 0 1px rgba(255, 255, 255, 0.15);
 }
+
+/* ========================================
+   CHARTS & GUARDRAILS CUSTOM RULES
+   ======================================== */
+
+/* SVG Donut Segment Hover transition */
+.donut-segment {
+  transition: stroke-width 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+  cursor: pointer;
+}
+
+.donut-segment:hover {
+  stroke-width: 16;
+  opacity: 1;
+}
+
+/* Donut text values fade-in */
+.donut-center-text {
+  animation: kiro-fadeIn 0.4s ease-out;
+}
+
+/* SVG Line Chart path stroke animation */
+.chart-line-path {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: draw-chart-line 2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes draw-chart-line {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Interactive Line Node pulse */
+.chart-node {
+  transition: r 0.2s ease, fill-opacity 0.2s ease;
+  cursor: pointer;
+}
+
+.chart-node:hover {
+  r: 7;
+  fill-opacity: 1;
+}
+
+/* Glowing Border/Shadow Utilities */
+.glow-green {
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
+  border-color: rgba(16, 185, 129, 0.4) !important;
+}
+
+.glow-orange {
+  box-shadow: 0 0 15px rgba(249, 115, 22, 0.25);
+  border-color: rgba(249, 115, 22, 0.4) !important;
+}
+
+.glow-red {
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.4) !important;
+}
+
+/* Interactive Badges */
+.badge-guardrail {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+}
+
+.badge-guardrail-pass {
+  background-color: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.badge-guardrail-warn {
+  background-color: rgba(249, 115, 22, 0.15);
+  color: #fb923c;
+  border-color: rgba(249, 115, 22, 0.3);
+}
+
+.badge-guardrail-fail {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border-color: rgba(239, 68, 68, 0.3);
+}

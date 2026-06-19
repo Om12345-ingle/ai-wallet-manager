@@ -935,7 +935,9 @@ export default function ChatInterface() {
         body: JSON.stringify({ 
           command: userMessage,
           publicKey,
-          contacts: contacts.map(c => c.name)
+          contacts: state.contacts, // Send full contacts array
+          balance: state.balance, // Send current balance
+          spendingInfo: state.spendingInfo // Send spending limits
         })
       })
 
@@ -953,9 +955,8 @@ export default function ChatInterface() {
 
       // Handle commands requiring confirmation — store and ask
       if (parsedCommand.requiresConfirmation) {
-        const confirmationMsg = generateConfirmationMessage(parsedCommand)
         setPendingCommand(parsedCommand)
-        addMessage(confirmationMsg, false)
+        addMessage("🔍 Security analysis complete. Please verify the transaction details below to proceed:", false)
         return
       }
 
@@ -1080,6 +1081,102 @@ export default function ChatInterface() {
             </div>
           </div>
         ))}
+
+        {/* AI Transaction Guardrails Card */}
+        {pendingCommand && pendingCommand.guardrails && (
+          <div className="flex justify-start animate-fade-in-scale">
+            <div className="flex items-start gap-3 w-full max-w-lg">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-white/25 to-black/35 flex items-center justify-center text-sm">
+                🤖
+              </div>
+              <div className="flex-1 p-6 rounded-2xl rounded-bl-md bg-gradient-to-br from-white/10 via-black/30 to-white/5 border border-white/20 backdrop-blur-xl shadow-2xl space-y-4">
+                {/* Card Title & Icon */}
+                <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">🛡️</span>
+                    <h4 className="font-bold text-white text-base">Transaction Guardrails</h4>
+                  </div>
+                  <span className="text-xs px-2.5 py-1 rounded-full bg-white/10 text-gray-300 font-semibold border border-white/10">
+                    Pending Confirmation
+                  </span>
+                </div>
+
+                {/* ELI5 Explanation */}
+                <div className="space-y-1">
+                  <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider">AI Summary (ELI5)</p>
+                  <p className="text-sm text-white leading-relaxed bg-white/5 p-3 rounded-xl border border-white/5 font-medium">
+                    {pendingCommand.guardrails.eli5}
+                  </p>
+                </div>
+
+                {/* Safety Checks List */}
+                <div className="space-y-2">
+                  <p className="text-xs text-gray-400 font-semibold uppercase tracking-wider">Safety Audits</p>
+                  <div className="space-y-2">
+                    {pendingCommand.guardrails.checks.map((check: any, idx: number) => {
+                      const badgeClass = check.status === 'pass' 
+                        ? 'badge-guardrail-pass' 
+                        : (check.status === 'warn' ? 'badge-guardrail-warn' : 'badge-guardrail-fail');
+                      return (
+                        <div key={idx} className="flex items-start justify-between gap-3 p-2.5 rounded-xl bg-white/5 border border-white/5">
+                          <span className="text-xs text-gray-300 font-medium">{check.name}</span>
+                          <span className={`badge-guardrail ${badgeClass} text-center flex-shrink-0`}>
+                            {check.msg}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Speed & Fees */}
+                <div className="grid grid-cols-2 gap-3 border-t border-white/10 pt-3 text-xs text-gray-400">
+                  <div className="flex justify-between p-2 rounded-lg bg-white/5">
+                    <span>Network Fee:</span>
+                    <span className="text-white font-mono">{pendingCommand.guardrails.fee}</span>
+                  </div>
+                  <div className="flex justify-between p-2 rounded-lg bg-white/5">
+                    <span>Est. Speed:</span>
+                    <span className="text-white font-mono">{pendingCommand.guardrails.speed}</span>
+                  </div>
+                </div>
+
+                {/* Confirm/Cancel Buttons */}
+                <div className="flex gap-3 pt-2">
+                  <button
+                    onClick={async () => {
+                      setLoading(true);
+                      try {
+                        const cmd = pendingCommand;
+                        setPendingCommand(null);
+                        const result = await executeCommand(cmd);
+                        const conversationalResult = addConversationalTouch(result, cmd);
+                        addMessage(conversationalResult, false);
+                      } catch (error: any) {
+                        const friendlyError = makeFriendlyError(error.message, pendingCommand.command || '');
+                        addMessage(friendlyError, false);
+                      } finally {
+                        setLoading(false);
+                      }
+                    }}
+                    className="flex-1 py-3 px-4 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30 text-white font-bold text-sm transition-all duration-300 hover:scale-105"
+                  >
+                    Confirm
+                  </button>
+                  <button
+                    onClick={() => {
+                      setPendingCommand(null);
+                      addMessage('Cancelled. What else can I help you with?', false);
+                    }}
+                    className="py-3 px-4 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-300 font-medium text-sm transition-all duration-300 hover:scale-105"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         
         {loading && (
           <div className="flex justify-start animate-fade-in-scale">

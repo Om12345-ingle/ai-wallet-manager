@@ -26,29 +26,36 @@ export default function Home() {
   const { state, setActiveTab } = useAppContext()
   const { publicKey, activeTab } = state
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-
   const renderPage = () => {
     if (!publicKey) {
       return (
-        <div className="flex-1 flex items-center justify-center min-h-screen px-4 py-8">
+        <div className="flex-1 flex flex-col items-center justify-center min-h-[85vh] px-4 py-8">
           <div className="text-center space-y-8 max-w-4xl w-full animate-slide-in-up">
-            <div className="space-y-3">
-              <div className="text-5xl animate-float-gentle">🤖</div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-white">AI Wallet Manager</h1>
-              <p className="text-gray-400 text-base sm:text-lg max-w-xl mx-auto">
-                Manage your Stellar wallet with natural language. Just type what you want to do.
+            <div className="space-y-4">
+              <div className="text-6xl animate-float-gentle inline-block">🤖</div>
+              <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
+                Stellar <span className="kiro-text-gradient bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-cyan-400 font-bold">AI Wallet</span> Manager
+              </h1>
+              <p className="text-gray-400 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
+                Connect your account and interact using natural speech. Swap assets, audit spending limit rules, and lock down accounts on-chain.
               </p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
+            
+            {/* Visual Value Props Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-12 text-left">
               {[
-                { icon: '🤖', title: 'AI Assistant', desc: 'Natural language commands for seamless wallet management' },
-                { icon: '🔒', title: 'Smart Security', desc: 'Spending limits and wallet freeze protection' },
-                { icon: '📊', title: 'Analytics', desc: 'Transaction insights and portfolio tracking' },
+                { icon: '🤖', title: 'NLP Command Chat', desc: 'Type naturally to swap, query balances, or pay friends.' },
+                { icon: '🔒', title: 'Guard Sign Limit Rules', desc: 'Enforce daily and monthly limits on-chain via smart contracts.' },
+                { icon: '📊', title: 'Allocation Graphics', desc: 'Beautiful interactive donut charts and transaction volume graphs.' },
               ].map((item, i) => (
-                <div key={i} className="backdrop-blur-xl bg-white/5 border border-white/15 rounded-2xl p-6 text-center hover:scale-105 transition-all duration-300" style={{ animationDelay: `${i * 0.1}s` }}>
+                <div 
+                  key={i} 
+                  className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-6 transition-all duration-300 hover:scale-105 hover:bg-white/10 hover:border-white/20 hover:shadow-2xl" 
+                  style={{ animationDelay: `${i * 0.1}s` }}
+                >
                   <div className="text-3xl mb-3">{item.icon}</div>
-                  <h3 className="font-bold text-white mb-2">{item.title}</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed">{item.desc}</p>
+                  <h3 className="font-bold text-white text-base mb-2">{item.title}</h3>
+                  <p className="text-gray-400 text-xs leading-relaxed">{item.desc}</p>
                 </div>
               ))}
             </div>
