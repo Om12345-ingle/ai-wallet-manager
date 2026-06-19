@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import * as StellarSdk from '@stellar/stellar-sdk'
 
 const server = new StellarSdk.Horizon.Server('https://horizon-testnet.stellar.org')
-// Note: SorobanRpc might not be available in this version, commenting out for now
-// const sorobanServer = new StellarSdk.SorobanRpc.Server('https://soroban-testnet.stellar.org')
 
 // Common Stellar assets
 const STELLAR_ASSETS = {
@@ -348,11 +346,21 @@ async function executeSwap(body: any) {
           limit: '922337203685.4775807' // Maximum limit
         })
       )
+    } else {
+      // If trustline already exists, add a small payment operation as a demo
+      // This simulates the swap by sending a small amount to self
+      transactionBuilder.addOperation(
+        StellarSdk.Operation.payment({
+          destination: publicKey,
+          asset: StellarSdk.Asset.native(),
+          amount: '0.0000001' // Minimal amount for demo
+        })
+      )
     }
 
-    // For testnet demo, we'll just create the trustline
+    // For testnet demo, we'll just create the trustline or send the dummy payment
     // In production, this would connect to a real DEX
-    // The trustline creation above is the main operation for now
+    // The trustline creation/dummy payment above is the main operation for now
 
     const transaction = transactionBuilder
       .addMemo(StellarSdk.Memo.text(`Swap ${amount} ${fromAsset} → ${toAsset}`))

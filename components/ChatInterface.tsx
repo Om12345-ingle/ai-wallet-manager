@@ -20,7 +20,7 @@ export default function ChatInterface() {
   
   const getDefaultWelcomeMessage = (): Message => ({
     id: '1',
-    text: 'Hey! 👋 I\'m your AI wallet assistant powered by Gemini. Just talk to me naturally!\n\n💬 **Try saying:**\n• "What\'s my balance?"\n• "Send 10 XLM to Alice"\n• "Swap 50 XLM to USDC"\n• "Show my portfolio"\n• "Freeze my wallet"\n• "Set daily limit to 500 XLM"\n• "List my contacts"\n• "What are current prices?"\n\nI understand natural language — no need for exact commands. Just say what you want! 🚀',
+    text: 'Hey! 👋 I\'m your AI wallet assistant. I run offline using smart keyword heuristics, or can connect to OpenAI, Groq, Ollama, or Gemini!\n\n💬 **Try saying:**\n• "What\'s my balance?"\n• "Send 10 XLM to Alice"\n• "Swap 50 XLM to USDC"\n• "Show my portfolio"\n• "Freeze my wallet"\n• "Set daily limit to 500 XLM"\n• "List my contacts"\n• "What are current prices?"\n\nI understand natural language — no need for exact commands. Just say what you want! 🚀',
     isUser: false,
     timestamp: new Date()
   })

@@ -87,9 +87,6 @@ export async function POST(request: NextRequest) {
 
     // Note: Real contract integration would go here
     // For now, we use simulation mode for all operations
-    console.log(`📋 Using simulation mode for action: ${action}`);
-
-    console.log('🎭 Using simulated smart contract');
     
     // Simulate smart contract operations (existing code)
     let responseData: any = {

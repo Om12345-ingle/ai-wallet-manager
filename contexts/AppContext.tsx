@@ -77,14 +77,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const parsedState = JSON.parse(savedState)
         setState(prevState => ({
           ...prevState,
-          // Load non-sensitive data
           activeTab: parsedState.activeTab || prevState.activeTab,
-          spendingInfo: parsedState.spendingInfo || prevState.spendingInfo,
           walletStatus: parsedState.walletStatus || prevState.walletStatus,
-          // Don't load sensitive keys from localStorage for security
           publicKey: '',
           secretKey: '',
-          contacts: [] // Contacts are loaded separately per wallet
+          contacts: []
         }))
       } catch (error) {
         console.error('Failed to parse saved state:', error)
@@ -96,84 +93,44 @@ export function AppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const stateToSave = {
       activeTab: state.activeTab,
-      spendingInfo: state.spendingInfo,
       walletStatus: state.walletStatus
-      // Don't save sensitive wallet keys or contacts (saved separately)
     }
     localStorage.setItem('ai-wallet-state', JSON.stringify(stateToSave))
-  }, [state.activeTab, state.spendingInfo, state.walletStatus])
-
-  // Save and load wallet-specific data (contacts and spending info)
-  useEffect(() => {
-    if (state.publicKey) {
-      // Save contacts for this wallet
-      if (state.contacts.length > 0) {
-        localStorage.setItem(`contacts_${state.publicKey}`, JSON.stringify(state.contacts))
-      }
-      
-      // Save spending info for this wallet
-      localStorage.setItem(`spending_${state.publicKey}`, JSON.stringify(state.spendingInfo))
-      
-      // Load wallet-specific data
-      const savedContacts = localStorage.getItem(`contacts_${state.publicKey}`)
-      const savedSpending = localStorage.getItem(`spending_${state.publicKey}`)
-      
-      let needsUpdate = false
-      const updates: Partial<AppState> = {}
-      
-      if (savedContacts) {
-        try {
-          const contacts = JSON.parse(savedContacts)
-          if (JSON.stringify(contacts) !== JSON.stringify(state.contacts)) {
-            updates.contacts = contacts
-            needsUpdate = true
-          }
-        } catch (error) {
-          console.error('Failed to parse saved contacts:', error)
-        }
-      }
-      
-      if (savedSpending) {
-        try {
-          const spendingInfo = JSON.parse(savedSpending)
-          if (JSON.stringify(spendingInfo) !== JSON.stringify(state.spendingInfo)) {
-            updates.spendingInfo = spendingInfo
-            needsUpdate = true
-          }
-        } catch (error) {
-          console.error('Failed to parse saved spending info:', error)
-        }
-      }
-      
-      if (needsUpdate) {
-        setState(prevState => ({
-          ...prevState,
-          ...updates
-        }))
-      }
-    }
-  }, [state.publicKey]) // Only run when publicKey changes
-
-  // Save contacts when they change
-  useEffect(() => {
-    if (state.publicKey && state.contacts.length >= 0) {
-      localStorage.setItem(`contacts_${state.publicKey}`, JSON.stringify(state.contacts))
-    }
-  }, [state.contacts, state.publicKey])
-
-  // Save spending info when it changes
-  useEffect(() => {
-    if (state.publicKey) {
-      localStorage.setItem(`spending_${state.publicKey}`, JSON.stringify(state.spendingInfo))
-    }
-  }, [state.spendingInfo, state.publicKey])
+  }, [state.activeTab, state.walletStatus])
 
   const updateWalletKeys = (publicKey: string, secretKey: string = '') => {
-    setState(prevState => ({
-      ...prevState,
-      publicKey,
-      secretKey
-    }))
+    setState(prevState => {
+      let contacts: Contact[] = []
+      let spendingInfo = defaultState.spendingInfo
+
+      if (publicKey) {
+        const savedContacts = localStorage.getItem(`contacts_${publicKey}`)
+        if (savedContacts) {
+          try {
+            contacts = JSON.parse(savedContacts)
+          } catch (e) {
+            console.error('Failed to parse saved contacts:', e)
+          }
+        }
+        
+        const savedSpending = localStorage.getItem(`spending_${publicKey}`)
+        if (savedSpending) {
+          try {
+            spendingInfo = JSON.parse(savedSpending)
+          } catch (e) {
+            console.error('Failed to parse saved spending info:', e)
+          }
+        }
+      }
+
+      return {
+        ...prevState,
+        publicKey,
+        secretKey,
+        contacts,
+        spendingInfo
+      }
+    })
   }
 
   const updateBalance = (balance: string) => {
@@ -191,51 +148,80 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }
 
   const updateSpendingInfo = (info: Partial<SpendingInfo>) => {
-    setState(prevState => ({
-      ...prevState,
-      spendingInfo: {
+    setState(prevState => {
+      const updatedInfo = {
         ...prevState.spendingInfo,
         ...info
       }
-    }))
+      if (prevState.publicKey) {
+        localStorage.setItem(`spending_${prevState.publicKey}`, JSON.stringify(updatedInfo))
+      }
+      return {
+        ...prevState,
+        spendingInfo: updatedInfo
+      }
+    })
   }
 
   const addContact = (contact: Contact) => {
-    setState(prevState => ({
-      ...prevState,
-      contacts: [...prevState.contacts.filter(c => c.name !== contact.name), contact]
-    }))
+    setState(prevState => {
+      const updatedContacts = [...prevState.contacts.filter(c => c.name !== contact.name), contact]
+      if (prevState.publicKey) {
+        localStorage.setItem(`contacts_${prevState.publicKey}`, JSON.stringify(updatedContacts))
+      }
+      return {
+        ...prevState,
+        contacts: updatedContacts
+      }
+    })
   }
 
   const removeContact = (name: string) => {
-    setState(prevState => ({
-      ...prevState,
-      contacts: prevState.contacts.filter(c => c.name !== name)
-    }))
+    setState(prevState => {
+      const updatedContacts = prevState.contacts.filter(c => c.name !== name)
+      if (prevState.publicKey) {
+        localStorage.setItem(`contacts_${prevState.publicKey}`, JSON.stringify(updatedContacts))
+      }
+      return {
+        ...prevState,
+        contacts: updatedContacts
+      }
+    })
   }
 
   const updateContact = (name: string, updates: Partial<Contact>) => {
-    setState(prevState => ({
-      ...prevState,
-      contacts: prevState.contacts.map(contact =>
+    setState(prevState => {
+      const updatedContacts = prevState.contacts.map(contact =>
         contact.name === name ? { ...contact, ...updates } : contact
       )
-    }))
+      if (prevState.publicKey) {
+        localStorage.setItem(`contacts_${prevState.publicKey}`, JSON.stringify(updatedContacts))
+      }
+      return {
+        ...prevState,
+        contacts: updatedContacts
+      }
+    })
   }
 
   const setWalletStatus = (status: 'active' | 'frozen') => {
-    setState(prevState => ({
-      ...prevState,
-      walletStatus: status,
-      spendingInfo: {
+    setState(prevState => {
+      const updatedInfo = {
         ...prevState.spendingInfo,
         isFrozen: status === 'frozen'
       }
-    }))
+      if (prevState.publicKey) {
+        localStorage.setItem(`spending_${prevState.publicKey}`, JSON.stringify(updatedInfo))
+      }
+      return {
+        ...prevState,
+        walletStatus: status,
+        spendingInfo: updatedInfo
+      }
+    })
   }
 
   const resetState = () => {
-    // Clear wallet-specific data if we have a publicKey
     if (state.publicKey) {
       localStorage.removeItem(`contacts_${state.publicKey}`)
       localStorage.removeItem(`spending_${state.publicKey}`)

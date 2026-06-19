@@ -30,11 +30,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if destination account exists
+    let destinationExists = true;
     try {
       await server.loadAccount(recipient);
     } catch (destError: any) {
       if (destError.response?.status === 404) {
-        throw new Error(`The recipient account does not exist on the Stellar network. You can only send XLM to accounts that have been funded at least once.`);
+        destinationExists = false;
+      } else {
+        throw destError;
+      }
+    }
+
+    if (!destinationExists) {
+      if (numAmount < 1) {
+        throw new Error(`The recipient account does not exist. To create and fund a new account on Stellar, you must send at least 1 XLM (the network minimum balance reserve).`);
       }
     }
 
@@ -47,11 +56,16 @@ export async function POST(request: NextRequest) {
       networkPassphrase,
     })
       .addOperation(
-        StellarSdk.Operation.payment({
-          destination: recipient,
-          asset: StellarSdk.Asset.native(),
-          amount: numAmount.toString(),
-        })
+        !destinationExists
+          ? StellarSdk.Operation.createAccount({
+              destination: recipient,
+              startingBalance: numAmount.toString(),
+            })
+          : StellarSdk.Operation.payment({
+              destination: recipient,
+              asset: StellarSdk.Asset.native(),
+              amount: numAmount.toString(),
+            })
       )
       .setTimeout(30)
       .build();

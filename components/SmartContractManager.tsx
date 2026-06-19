@@ -375,29 +375,13 @@ export default function SmartContractManager({ publicKey, secretKey }: SmartCont
                   className="flex-1 px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <button
-                  onClick={(e) => {
-                    console.log('Set Daily button clicked!');
-                    e.preventDefault();
-                    handleSetDailyLimit();
-                  }}
+                  onClick={handleSetDailyLimit}
                   disabled={loading || !dailyLimit}
                   className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:bg-gray-300 font-medium"
                 >
                   Set Daily
                 </button>
               </div>
-              <div className="mt-2 text-xs text-blue-600">
-                Debug: dailyLimit = "{dailyLimit}", loading = {loading.toString()}, disabled = {(loading || !dailyLimit).toString()}
-              </div>
-              <button
-                onClick={() => {
-                  console.log('Test button clicked!');
-                  alert('Test button works! dailyLimit = ' + dailyLimit);
-                }}
-                className="mt-2 px-3 py-1 bg-purple-500 text-white rounded text-sm"
-              >
-                🧪 Test Button
-              </button>
             </div>
 
             <div className="bg-green-50 p-4 rounded-lg">
@@ -500,15 +484,8 @@ export default function SmartContractManager({ publicKey, secretKey }: SmartCont
                 placeholder="GXXX... (Stellar address)"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              <div className="text-xs text-gray-500 mb-2">
-                Debug: contactName="{contactName}", contactAddress="{contactAddress}", disabled={(loading || !contactName || !contactAddress).toString()}
-              </div>
               <button
-                onClick={(e) => {
-                  console.log('Add Contact button clicked!');
-                  e.preventDefault();
-                  handleAddContact();
-                }}
+                onClick={handleAddContact}
                 disabled={loading || !contactName || !contactAddress}
                 className="w-full px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300"
               >
@@ -521,45 +498,6 @@ export default function SmartContractManager({ publicKey, secretKey }: SmartCont
               <p className="text-xs text-blue-600">• "Save GXXX as Alice to contract"</p>
               <p className="text-xs text-blue-600">• "Make Alice trusted"</p>
               <p className="text-xs text-blue-600">• "List contacts"</p>
-            </div>
-            
-            <div className="mt-4 space-y-2">
-              <button
-                onClick={() => {
-                  console.log('Simple test button clicked!');
-                  alert(`Simple test works!\nContact Name: "${contactName}"\nContact Address: "${contactAddress}"`);
-                }}
-                className="w-full px-4 py-2 bg-red-500 text-white rounded text-sm"
-              >
-                🚨 Simple Test Button
-              </button>
-              
-              <button
-                onClick={async () => {
-                  console.log('Testing connection with keys:', { 
-                    publicKey: publicKey?.slice(0, 8) + '...', 
-                    hasSecretKey: !!secretKey,
-                    secretKeyLength: secretKey?.length 
-                  });
-                  
-                  try {
-                    const result = await callSmartContract('get_spending_info')
-                    alert(`✅ Smart Contract Connected!\nDaily Limit: ${result.spendingInfo?.dailyLimit || 1000} XLM\nStatus: ${result.spendingInfo?.isFrozen ? 'FROZEN' : 'ACTIVE'}`)
-                  } catch (error: any) {
-                    console.error('Connection test failed:', error);
-                    alert('❌ Smart Contract connection failed - check console for details')
-                  }
-                }}
-                disabled={loading}
-                className="w-full px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-600 disabled:bg-gray-300 text-sm"
-              >
-                🔗 Test Smart Contract Connection
-              </button>
-              
-              <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
-                Debug: Public Key: {publicKey ? `${publicKey.slice(0, 8)}...` : 'Not set'} | 
-                Secret Key: {secretKey ? 'Set' : 'Not set'}
-              </div>
             </div>
           </div>
         </div>
