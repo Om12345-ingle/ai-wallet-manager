@@ -50,6 +50,7 @@ export default function WalletHeader() {
   }
 
   const isLoginPage = !publicKey
+  const isMainnet = process.env.NEXT_PUBLIC_STELLAR_NETWORK === 'mainnet'
 
   return (
     <div className="relative">
@@ -67,7 +68,7 @@ export default function WalletHeader() {
               <h1 className="text-4xl font-bold text-white">AI Wallet Manager</h1>
             </div>
             <p className="text-xl text-gray-300 mb-6">
-              Connect your Stellar testnet wallet to unlock AI-powered management
+              Connect your Stellar {isMainnet ? 'mainnet' : 'testnet'} wallet to unlock AI-powered management
             </p>
           </div>
         )}
@@ -77,13 +78,21 @@ export default function WalletHeader() {
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-4">
               <div className="relative">
-                <span className="px-4 py-2 text-sm font-semibold rounded-2xl bg-gradient-to-r from-white/20 to-black/20 border border-white/30 text-white animate-pulse-glow">
-                  🧪 TESTNET
+                <span className={`px-4 py-2 text-sm font-semibold rounded-2xl border animate-pulse-glow ${
+                  isMainnet 
+                    ? 'bg-gradient-to-r from-yellow-500/20 to-black/20 border-yellow-500/35 text-yellow-400' 
+                    : 'bg-gradient-to-r from-white/20 to-black/20 border-white/30 text-white'
+                }`}>
+                  {isMainnet ? '🟢 MAINNET' : '🧪 TESTNET'}
                 </span>
               </div>
               <div className="hidden md:block">
-                <p className="text-sm text-gray-300 font-medium">Development Environment</p>
-                <p className="text-xs text-gray-500">Safe testing with testnet credentials</p>
+                <p className="text-sm text-gray-300 font-medium">
+                  {isMainnet ? 'Production Network' : 'Sandbox Environment'}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {isMainnet ? 'Secured live ledger environment' : 'Safe testing with mock ledger accounts'}
+                </p>
               </div>
             </div>
             {publicKey && (
@@ -98,11 +107,15 @@ export default function WalletHeader() {
           </div>
         )}
 
-        {/* Testnet Badge for Login Page */}
+        {/* Network Badge for Login Page */}
         {isLoginPage && (
           <div className="flex justify-center mb-6">
-            <span className="px-6 py-3 text-base font-semibold rounded-2xl bg-gradient-to-r from-white/20 to-black/20 border border-white/30 text-white animate-pulse-glow">
-              🧪 TESTNET ENVIRONMENT
+            <span className={`px-6 py-3 text-base font-semibold rounded-2xl border animate-pulse-glow ${
+              isMainnet
+                ? 'bg-gradient-to-r from-yellow-500/20 to-black/20 border-yellow-500/30 text-yellow-300'
+                : 'bg-gradient-to-r from-white/20 to-black/20 border-white/30 text-white'
+            }`}>
+              {isMainnet ? '🟢 STELLAR LIVE MAINNET' : '🧪 SANDBOX TESTNET ENVIRONMENT'}
             </span>
           </div>
         )}
@@ -166,7 +179,7 @@ export default function WalletHeader() {
             </div>
             
             {/* Action Buttons */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className={`grid gap-6 ${isMainnet ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
               <button
                 onClick={fetchBalance}
                 disabled={loading}
@@ -175,32 +188,34 @@ export default function WalletHeader() {
                 <span className="mr-2 text-lg">🔄</span>
                 Refresh Balance
               </button>
-              <button
-                onClick={async () => {
-                  try {
-                    const response = await fetch('/api/stellar/fund-testnet', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ publicKey })
-                    })
-                    
-                    const data = await response.json()
-                    
-                    if (response.ok) {
-                      alert('Account funded with 10,000 test XLM!')
-                      fetchBalance()
-                    } else {
-                      alert(`Funding failed: ${data.error}`)
+              {!isMainnet && (
+                <button
+                  onClick={async () => {
+                    try {
+                      const response = await fetch('/api/stellar/fund-testnet', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ publicKey })
+                      })
+                      
+                      const data = await response.json()
+                      
+                      if (response.ok) {
+                        alert('Account funded with 10,000 test XLM!')
+                        fetchBalance()
+                      } else {
+                        alert(`Funding failed: ${data.error}`)
+                      }
+                    } catch (error) {
+                      alert('Failed to fund account. Try using Friendbot directly.')
                     }
-                  } catch (error) {
-                    alert('Failed to fund account. Try using Friendbot directly.')
-                  }
-                }}
-                className="kiro-btn kiro-btn-success hover:scale-105 transition-all duration-300 py-3"
-              >
-                <span className="mr-2 text-lg">💰</span>
-                Fund Testnet
-              </button>
+                  }}
+                  className="kiro-btn kiro-btn-success hover:scale-105 transition-all duration-300 py-3"
+                >
+                  <span className="mr-2 text-lg">💰</span>
+                  Fund Testnet
+                </button>
+              )}
             </div>
           </div>
         )}

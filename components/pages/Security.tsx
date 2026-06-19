@@ -10,6 +10,7 @@ export default function Security() {
   const [loading, setLoading] = useState(false)
   const [emergencyContact, setEmergencyContact] = useState('')
   const [walletSettings, setWalletSettings] = useState<any>(null)
+  const isMainnet = process.env.NEXT_PUBLIC_STELLAR_NETWORK === 'mainnet'
 
   const callSmartContract = async (action: string, params: any = {}) => {
     setLoading(true)
@@ -142,11 +143,11 @@ export default function Security() {
       action: 'Ensure your secret key is backed up securely'
     },
     {
-      id: 'testnet_only',
-      title: 'Testnet Environment',
-      description: 'Using testnet for development',
+      id: 'network_status',
+      title: isMainnet ? 'Mainnet Secure Mode' : 'Testnet Sandbox Mode',
+      description: isMainnet ? 'Connected to Stellar Live network' : 'Using Stellar testnet for sandbox testing',
       status: 'complete',
-      action: 'Never use mainnet keys in development'
+      action: isMainnet ? 'Always double check transaction data' : 'Never use mainnet keys in sandbox'
     }
   ]
 

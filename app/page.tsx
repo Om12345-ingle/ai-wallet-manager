@@ -34,7 +34,7 @@ export default function Home() {
             <div className="space-y-4">
               <div className="text-6xl animate-float-gentle inline-block">🤖</div>
               <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
-                Stellar <span className="kiro-text-gradient bg-clip-text text-transparent bg-gradient-to-r from-violet-400 to-cyan-400 font-bold">AI Wallet</span> Manager
+                Stellar <span className="kiro-text-gradient font-bold">AI Wallet</span> Manager
               </h1>
               <p className="text-gray-400 text-base sm:text-lg max-w-xl mx-auto leading-relaxed">
                 Connect your account and interact using natural speech. Swap assets, audit spending limit rules, and lock down accounts on-chain.

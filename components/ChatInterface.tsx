@@ -5,7 +5,9 @@ import { useState, useEffect } from 'react'
 import { useAppContext } from '@/contexts/AppContext'
 
 // Network configuration
-const STELLAR_NETWORK_PASSPHRASE = 'Test SDF Network ; September 2015' // Testnet
+const getNetworkPassphrase = () => process.env.NEXT_PUBLIC_STELLAR_NETWORK === 'mainnet'
+  ? 'Public Global Stellar Network ; October 2015'
+  : 'Test SDF Network ; September 2015'
 
 interface Message {
   id: string
@@ -270,8 +272,8 @@ export default function ChatInterface() {
             
             const { transactionXDR } = await transactionResponse.json()
             
-            // Sign with Freighter (using testnet)
-            const signedXDR = await signTransaction(transactionXDR, STELLAR_NETWORK_PASSPHRASE)
+            // Sign with Freighter
+            const signedXDR = await signTransaction(transactionXDR, getNetworkPassphrase())
             
             // Submit signed transaction
             response = await fetch('/api/stellar/send', {
@@ -399,8 +401,8 @@ export default function ChatInterface() {
             
             const { transactionXDR } = await transactionResponse.json()
             
-            // Sign with Freighter (using testnet)
-            const signedXDR = await signTransaction(transactionXDR, STELLAR_NETWORK_PASSPHRASE)
+            // Sign with Freighter
+            const signedXDR = await signTransaction(transactionXDR, getNetworkPassphrase())
             
             // Submit signed transaction
             response = await fetch('/api/stellar/send', {
@@ -677,7 +679,7 @@ export default function ChatInterface() {
             const { transactionXDR } = await transactionResponse.json()
             
             // Sign with Freighter
-            const signedXDR = await signTransaction(transactionXDR, STELLAR_NETWORK_PASSPHRASE)
+            const signedXDR = await signTransaction(transactionXDR, getNetworkPassphrase())
             
             // Submit signed transaction
             response = await fetch('/api/stellar/multi-asset', {

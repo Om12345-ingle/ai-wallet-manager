@@ -142,6 +142,11 @@ export class WalletConnectionService {
 
   // Sign transaction with connected wallet
   static async signTransaction(transaction: string, walletType: 'freighter' | 'albedo'): Promise<string> {
+    const isMainnet = process.env.NEXT_PUBLIC_STELLAR_NETWORK === 'mainnet'
+    const networkPassphrase = isMainnet
+      ? 'Public Global Stellar Network ; October 2015'
+      : 'Test SDF Network ; September 2015'
+
     switch (walletType) {
       case 'freighter':
         const freighter = getFreighterAPI()
@@ -149,7 +154,7 @@ export class WalletConnectionService {
           throw new Error('Freighter wallet not available')
         }
         return await freighter.signTransaction(transaction, { 
-          networkPassphrase: 'Test SDF Network ; September 2015' 
+          networkPassphrase 
         })
       case 'albedo':
         if (!window.albedo) {

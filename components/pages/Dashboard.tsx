@@ -9,6 +9,7 @@ export default function Dashboard() {
   const { state, updateBalance, updateSpendingInfo, setActiveTab } = useAppContext()
   const { publicKey, secretKey, balance, spendingInfo } = state
   const [loading, setLoading] = useState(false)
+  const isMainnet = process.env.NEXT_PUBLIC_STELLAR_NETWORK === 'mainnet'
 
   const fetchBalance = async () => {
     if (!publicKey) return
@@ -112,27 +113,42 @@ export default function Dashboard() {
                 <div className="text-gray-400 text-xs">Save addresses and send XLM</div>
               </div>
             </button>
-            <button
-              onClick={async () => {
-                try {
-                  const res = await fetch('/api/stellar/fund-testnet', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ publicKey })
-                  })
-                  const data = await res.json()
-                  if (res.ok) { alert('Funded with 10,000 test XLM!'); fetchBalance() }
-                  else alert(`Funding failed: ${data.error}`)
-                } catch { alert('Failed to fund. Try Friendbot directly.') }
-              }}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-green-500/10 hover:bg-green-500/20 border border-green-500/20 hover:border-green-500/30 transition-all duration-200 text-left"
-            >
-              <span className="text-xl">💸</span>
-              <div>
-                <div className="text-green-300 text-sm font-medium">Fund Testnet Account</div>
-                <div className="text-gray-400 text-xs">Get 10,000 free test XLM</div>
-              </div>
-            </button>
+            {!isMainnet ? (
+              <button
+                onClick={async () => {
+                  try {
+                    const res = await fetch('/api/stellar/fund-testnet', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ publicKey })
+                    })
+                    const data = await res.json()
+                    if (res.ok) { alert('Funded with 10,000 test XLM!'); fetchBalance() }
+                    else alert(`Funding failed: ${data.error}`)
+                  } catch { alert('Failed to fund. Try Friendbot directly.') }
+                }}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-green-500/10 hover:bg-green-500/20 border border-green-500/20 hover:border-green-500/30 transition-all duration-200 text-left"
+              >
+                <span className="text-xl">💸</span>
+                <div>
+                  <div className="text-green-300 text-sm font-medium">Fund Testnet Account</div>
+                  <div className="text-gray-400 text-xs">Get 10,000 free test XLM</div>
+                </div>
+              </button>
+            ) : (
+              <a
+                href={`https://stellar.expert/explorer/public/account/${publicKey}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/20 hover:border-yellow-500/30 transition-all duration-200 text-left block"
+              >
+                <span className="text-xl">🌐</span>
+                <div>
+                  <div className="text-yellow-300 text-sm font-medium">View on StellarExpert</div>
+                  <div className="text-gray-400 text-xs">Examine ledger address transaction history</div>
+                </div>
+              </a>
+            )}
           </div>
         </div>
 
@@ -143,11 +159,11 @@ export default function Dashboard() {
             {[
               { label: 'Wallet Connected', ok: true },
               { label: 'Balance Loaded', ok: !!balance && balance !== '0' },
-              { label: 'Testnet Network', ok: true },
+              { label: 'Stellar ' + (isMainnet ? 'Mainnet' : 'Testnet'), ok: true },
             ].map((item, i) => (
               <div key={i} className="flex justify-between items-center p-3 rounded-xl bg-white/5 border border-white/10">
                 <div className="flex items-center gap-3">
-                  <div className={`w-2 h-2 rounded-full ${item.ok ? 'bg-green-400 animate-pulse' : 'bg-gray-500'}`} />
+                  <div className={`w-2 h-2 rounded-full ${item.ok ? (isMainnet ? 'bg-yellow-500 animate-pulse' : 'bg-green-400 animate-pulse') : 'bg-gray-500'}`} />
                   <span className="text-white text-sm">{item.label}</span>
                 </div>
                 <span className="text-sm">{item.ok ? '✅' : '⏳'}</span>
@@ -155,7 +171,7 @@ export default function Dashboard() {
             ))}
             <div className="flex justify-between items-center p-3 rounded-xl bg-white/5 border border-white/10">
               <div className="flex items-center gap-3">
-                <div className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
+                <div className={`w-2 h-2 rounded-full ${isMainnet ? 'bg-yellow-500 animate-pulse' : 'bg-green-400 animate-pulse'}`} />
                 <span className="text-white text-sm">Smart Contracts</span>
               </div>
               <ContractStatus />
