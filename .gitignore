@@ -116,3 +116,9 @@ alice.toml
 # Test files
 test-*.js
 .vercel
+
+# IDE/Build/Agent artifacts
+tsconfig.tsbuildinfo
+skills-lock.json
+.agents/
+
