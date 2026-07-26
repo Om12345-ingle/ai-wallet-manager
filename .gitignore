@@ -110,15 +110,18 @@ contracts/*/target/
 contracts/*/.soroban/
 
 # Stellar keys (security)
-*.toml
 alice.toml
+!Cargo.toml
+!**/Cargo.toml
 
 # Test files
 test-*.js
 .vercel
 
-# IDE/Build/Agent artifacts
+# Cargo and test artifacts
+target/
+test_snapshots/
 tsconfig.tsbuildinfo
-skills-lock.json
-.agents/
+
+
 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import * as StellarSdk from '@stellar/stellar-sdk'
+import { SorobanContractClient } from '@/lib/soroban'
 
 const server = new StellarSdk.Horizon.Server('https://horizon-testnet.stellar.org')
 
@@ -86,11 +87,13 @@ export async function GET() {
 
 async function getPortfolio(publicKey: string) {
   try {
+    const sorobanPortfolio = await SorobanContractClient.getPortfolio(publicKey)
     const account = await server.loadAccount(publicKey)
     const portfolio: any = {
       owner: publicKey,
       assets: {},
       totalValueXLM: 0,
+      contractIntegrated: Boolean(sorobanPortfolio),
       lastUpdated: new Date().toISOString()
     }
 

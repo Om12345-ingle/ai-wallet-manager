@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { SorobanContractClient } from '@/lib/soroban';
 
 // Check if we should use real contract or simulation
 const USE_REAL_CONTRACT = process.env.SOROBAN_CONTRACT_ID && process.env.SOROBAN_CONTRACT_ID !== '';
@@ -85,14 +86,14 @@ export async function POST(request: NextRequest) {
       throw new Error('Public key is required');
     }
 
-    // Note: Real contract integration would go here
-    // For now, we use simulation mode for all operations
+    // Try reading real Soroban contract status first
+    const sorobanInfo = await SorobanContractClient.getSpendingInfo(publicKey);
     
     // Simulate smart contract operations (existing code)
     let responseData: any = {
       success: true,
       action: action,
-      smartContract: USE_REAL_CONTRACT ? 'real-contract-fallback' : 'simulated'
+      smartContract: sorobanInfo ? 'soroban-on-chain' : 'simulated'
     };
     
     switch (action) {

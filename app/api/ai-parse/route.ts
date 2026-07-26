@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import * as StellarSdk from "@stellar/stellar-sdk";
+import { SorobanContractClient } from "@/lib/soroban";
 
 // Initialize Gemini if key is present
 const geminiKey = process.env.GEMINI_API_KEY || "";
 const genAI = geminiKey ? new GoogleGenerativeAI(geminiKey) : null;
+
+// Contract ID definitions for AI parser contract integration
+const WALLET_GUARD_CONTRACT_ID = SorobanContractClient.getWalletGuardContractId();
+const MULTI_ASSET_CONTRACT_ID = SorobanContractClient.getMultiAssetContractId();
 
 // ── Regex-based fast parser (runs first, no API cost) ─────────────────────────
 function parseCommandFast(command: string): any | null {
