@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAppContext } from '@/contexts/AppContext'
 
 // Network configuration
@@ -52,29 +52,9 @@ export default function MultiAssetPortfolio() {
   const [swapAmount, setSwapAmount] = useState('')
   const [swapCalculation, setSwapCalculation] = useState<any>(null)
   const [swapLoading, setSwapLoading] = useState(false)
+  const loadedPortfolioFor = useRef('')
 
-  useEffect(() => {
-    if (publicKey) {
-      loadPortfolio()
-      loadSupportedAssets()
-      loadSwapHistory()
-    }
-  }, [publicKey])
-
-  // Also load swap history when switching to history tab
-  useEffect(() => {
-    if (activeTab === 'history' && publicKey) {
-      loadSwapHistory()
-    }
-  }, [activeTab, publicKey])
-
-  useEffect(() => {
-    if (swapAmount && fromAsset && toAsset && parseFloat(swapAmount) > 0) {
-      calculateSwap()
-    }
-  }, [swapAmount, fromAsset, toAsset])
-
-  const callMultiAssetAPI = async (action: string, params: any = {}) => {
+  const callMultiAssetAPI = useCallback(async (action: string, params: any = {}) => {
     try {
       const response = await fetch('/api/stellar/multi-asset', {
         method: 'POST',
@@ -96,9 +76,9 @@ export default function MultiAssetPortfolio() {
       console.error('Multi-asset API error:', error)
       throw error
     }
-  }
+  }, [publicKey, secretKey])
 
-  const loadPortfolio = async () => {
+  const loadPortfolio = useCallback(async () => {
     try {
       setLoading(true)
       const result = await callMultiAssetAPI('get_portfolio')
@@ -108,18 +88,18 @@ export default function MultiAssetPortfolio() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [callMultiAssetAPI])
 
-  const loadSupportedAssets = async () => {
+  const loadSupportedAssets = useCallback(async () => {
     try {
       const result = await callMultiAssetAPI('get_supported_assets')
       setSupportedAssets(result.assets)
     } catch (error: any) {
       console.error('Failed to load supported assets:', error)
     }
-  }
+  }, [callMultiAssetAPI])
 
-  const loadSwapHistory = async () => {
+  const loadSwapHistory = useCallback(async () => {
     try {
       console.log('Loading swap history for:', publicKey)
       const result = await callMultiAssetAPI('get_swap_history')
@@ -129,9 +109,9 @@ export default function MultiAssetPortfolio() {
     } catch (error: any) {
       console.error('Failed to load swap history:', error)
     }
-  }
+  }, [callMultiAssetAPI, publicKey])
 
-  const calculateSwap = async () => {
+  const calculateSwap = useCallback(async () => {
     try {
       const result = await callMultiAssetAPI('calculate_swap', {
         fromAsset,
@@ -143,7 +123,31 @@ export default function MultiAssetPortfolio() {
       console.error('Failed to calculate swap:', error)
       setSwapCalculation(null)
     }
-  }
+  }, [callMultiAssetAPI, fromAsset, swapAmount, toAsset])
+
+  useEffect(() => {
+    if (publicKey && loadedPortfolioFor.current !== publicKey) {
+      loadedPortfolioFor.current = publicKey
+      loadPortfolio()
+      loadSupportedAssets()
+      loadSwapHistory()
+    } else if (!publicKey) {
+      loadedPortfolioFor.current = ''
+    }
+  }, [publicKey, loadPortfolio, loadSupportedAssets, loadSwapHistory])
+
+  // Also load swap history when switching to history tab
+  useEffect(() => {
+    if (activeTab === 'history' && publicKey) {
+      loadSwapHistory()
+    }
+  }, [activeTab, publicKey, loadSwapHistory])
+
+  useEffect(() => {
+    if (swapAmount && fromAsset && toAsset && parseFloat(swapAmount) > 0) {
+      calculateSwap()
+    }
+  }, [swapAmount, fromAsset, toAsset, calculateSwap])
 
   const executeSwap = async () => {
     if (!swapAmount || !swapCalculation) return

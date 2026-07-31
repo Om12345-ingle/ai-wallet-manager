@@ -1,6 +1,14 @@
 'use client'
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  ReactNode,
+} from 'react'
 
 interface Contact {
   name: string
@@ -65,6 +73,17 @@ const defaultState: AppState = {
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined)
+const validTabs = new Set([
+  'dashboard',
+  'chat',
+  'contacts',
+  'spending',
+  'security',
+  'contracts',
+  'analytics',
+  'feedback',
+  'help',
+])
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AppState>(defaultState)
@@ -72,12 +91,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
   // Load general state from localStorage on mount
   useEffect(() => {
     const savedState = localStorage.getItem('ai-wallet-state')
+    const requestedTab = new URLSearchParams(window.location.search).get('tab')
     if (savedState) {
       try {
         const parsedState = JSON.parse(savedState)
         setState(prevState => ({
           ...prevState,
-          activeTab: parsedState.activeTab || prevState.activeTab,
+          activeTab:
+            (requestedTab && validTabs.has(requestedTab) && requestedTab) ||
+            parsedState.activeTab ||
+            prevState.activeTab,
           walletStatus: parsedState.walletStatus || prevState.walletStatus,
           publicKey: '',
           secretKey: '',
@@ -86,6 +109,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         console.error('Failed to parse saved state:', error)
       }
+    } else if (requestedTab && validTabs.has(requestedTab)) {
+      setState(prevState => ({ ...prevState, activeTab: requestedTab }))
     }
   }, [])
 
@@ -98,7 +123,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('ai-wallet-state', JSON.stringify(stateToSave))
   }, [state.activeTab, state.walletStatus])
 
-  const updateWalletKeys = (publicKey: string, secretKey: string = '') => {
+  const updateWalletKeys = useCallback((publicKey: string, secretKey: string = '') => {
     setState(prevState => {
       let contacts: Contact[] = []
       let spendingInfo = defaultState.spendingInfo
@@ -131,23 +156,27 @@ export function AppProvider({ children }: { children: ReactNode }) {
         spendingInfo
       }
     })
-  }
+  }, [])
 
-  const updateBalance = (balance: string) => {
+  const updateBalance = useCallback((balance: string) => {
     setState(prevState => ({
       ...prevState,
       balance
     }))
-  }
+  }, [])
 
-  const setActiveTab = (tab: string) => {
+  const setActiveTab = useCallback((tab: string) => {
+    if (!validTabs.has(tab)) return
+    const url = new URL(window.location.href)
+    url.searchParams.set('tab', tab)
+    window.history.replaceState({}, '', url)
     setState(prevState => ({
       ...prevState,
       activeTab: tab
     }))
-  }
+  }, [])
 
-  const updateSpendingInfo = (info: Partial<SpendingInfo>) => {
+  const updateSpendingInfo = useCallback((info: Partial<SpendingInfo>) => {
     setState(prevState => {
       const updatedInfo = {
         ...prevState.spendingInfo,
@@ -161,9 +190,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
         spendingInfo: updatedInfo
       }
     })
-  }
+  }, [])
 
-  const addContact = (contact: Contact) => {
+  const addContact = useCallback((contact: Contact) => {
     setState(prevState => {
       const updatedContacts = [...prevState.contacts.filter(c => c.name !== contact.name), contact]
       if (prevState.publicKey) {
@@ -174,9 +203,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
         contacts: updatedContacts
       }
     })
-  }
+  }, [])
 
-  const removeContact = (name: string) => {
+  const removeContact = useCallback((name: string) => {
     setState(prevState => {
       const updatedContacts = prevState.contacts.filter(c => c.name !== name)
       if (prevState.publicKey) {
@@ -187,9 +216,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
         contacts: updatedContacts
       }
     })
-  }
+  }, [])
 
-  const updateContact = (name: string, updates: Partial<Contact>) => {
+  const updateContact = useCallback((name: string, updates: Partial<Contact>) => {
     setState(prevState => {
       const updatedContacts = prevState.contacts.map(contact =>
         contact.name === name ? { ...contact, ...updates } : contact
@@ -202,9 +231,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
         contacts: updatedContacts
       }
     })
-  }
+  }, [])
 
-  const setWalletStatus = (status: 'active' | 'frozen') => {
+  const setWalletStatus = useCallback((status: 'active' | 'frozen') => {
     setState(prevState => {
       const updatedInfo = {
         ...prevState.spendingInfo,
@@ -219,9 +248,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
         spendingInfo: updatedInfo
       }
     })
-  }
+  }, [])
 
-  const resetState = () => {
+  const resetState = useCallback(() => {
     if (state.publicKey) {
       localStorage.removeItem(`contacts_${state.publicKey}`)
       localStorage.removeItem(`spending_${state.publicKey}`)
@@ -230,9 +259,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     
     setState(defaultState)
     localStorage.removeItem('ai-wallet-state')
-  }
+  }, [state.publicKey])
 
-  const contextValue: AppContextType = {
+  const contextValue = useMemo<AppContextType>(() => ({
     state,
     updateWalletKeys,
     updateBalance,
@@ -243,7 +272,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
     updateContact,
     setWalletStatus,
     resetState
-  }
+  }), [
+    state,
+    updateWalletKeys,
+    updateBalance,
+    setActiveTab,
+    updateSpendingInfo,
+    addContact,
+    removeContact,
+    updateContact,
+    setWalletStatus,
+    resetState,
+  ])
 
   return (
     <AppContext.Provider value={contextValue}>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAppContext } from '@/contexts/AppContext'
 
 export default function SpendingLimits() {
@@ -10,7 +10,7 @@ export default function SpendingLimits() {
   const [dailyLimit, setDailyLimit] = useState('')
   const [monthlyLimit, setMonthlyLimit] = useState('')
 
-  const callSmartContract = async (action: string, params: any = {}) => {
+  const callSmartContract = useCallback(async (action: string, params: any = {}) => {
     setLoading(true)
     try {
       const requestBody = {
@@ -42,9 +42,9 @@ export default function SpendingLimits() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [publicKey, secretKey])
 
-  const loadSpendingInfo = async () => {
+  const loadSpendingInfo = useCallback(async () => {
     try {
       console.log('Loading spending info for publicKey:', publicKey)
       const result = await callSmartContract('get_spending_info')
@@ -66,13 +66,13 @@ export default function SpendingLimits() {
     } catch (error) {
       console.error('Failed to load spending info:', error)
     }
-  }
+  }, [callSmartContract, publicKey, updateSpendingInfo])
 
   useEffect(() => {
     if (publicKey) {
       loadSpendingInfo()
     }
-  }, [publicKey])
+  }, [publicKey, loadSpendingInfo])
 
   const handleSetDailyLimit = async () => {
     if (!dailyLimit) {

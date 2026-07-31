@@ -1,5 +1,7 @@
 #![no_std]
-use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, Address, Env, String, Symbol};
+use soroban_sdk::{
+    contract, contractimpl, contracttype, symbol_short, Address, Env, String, Symbol,
+};
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -51,7 +53,9 @@ impl WalletGuard {
             is_frozen: false,
         };
 
-        env.storage().instance().set(&(SPENDING_INFO, owner), &default_spending);
+        env.storage()
+            .instance()
+            .set(&(SPENDING_INFO, owner), &default_spending);
     }
 
     /// Set daily spending limit
@@ -60,7 +64,9 @@ impl WalletGuard {
 
         let mut spending_info = Self::get_spending_info(env.clone(), owner.clone());
         spending_info.daily_limit = limit;
-        env.storage().instance().set(&(SPENDING_INFO, owner), &spending_info);
+        env.storage()
+            .instance()
+            .set(&(SPENDING_INFO, owner), &spending_info);
     }
 
     /// Set monthly spending limit
@@ -69,7 +75,9 @@ impl WalletGuard {
 
         let mut spending_info = Self::get_spending_info(env.clone(), owner.clone());
         spending_info.monthly_limit = limit;
-        env.storage().instance().set(&(SPENDING_INFO, owner), &spending_info);
+        env.storage()
+            .instance()
+            .set(&(SPENDING_INFO, owner), &spending_info);
     }
 
     /// Set max transaction limit
@@ -78,7 +86,9 @@ impl WalletGuard {
 
         let mut spending_info = Self::get_spending_info(env.clone(), owner.clone());
         spending_info.max_tx_amount = max_tx;
-        env.storage().instance().set(&(SPENDING_INFO, owner), &spending_info);
+        env.storage()
+            .instance()
+            .set(&(SPENDING_INFO, owner), &spending_info);
     }
 
     /// Freeze wallet for emergency security
@@ -87,7 +97,9 @@ impl WalletGuard {
 
         let mut spending_info = Self::get_spending_info(env.clone(), owner.clone());
         spending_info.is_frozen = true;
-        env.storage().instance().set(&(SPENDING_INFO, owner), &spending_info);
+        env.storage()
+            .instance()
+            .set(&(SPENDING_INFO, owner), &spending_info);
     }
 
     /// Unfreeze wallet
@@ -96,11 +108,19 @@ impl WalletGuard {
 
         let mut spending_info = Self::get_spending_info(env.clone(), owner.clone());
         spending_info.is_frozen = false;
-        env.storage().instance().set(&(SPENDING_INFO, owner), &spending_info);
+        env.storage()
+            .instance()
+            .set(&(SPENDING_INFO, owner), &spending_info);
     }
 
     /// Add or update a security contact
-    pub fn add_contact(env: Env, owner: Address, name: String, contact_address: Address, is_trusted: bool) {
+    pub fn add_contact(
+        env: Env,
+        owner: Address,
+        name: String,
+        contact_address: Address,
+        is_trusted: bool,
+    ) {
         owner.require_auth();
 
         let contact = Contact {
@@ -178,7 +198,9 @@ impl WalletGuard {
         spending_info.monthly_spent += amount;
         spending_info.last_spent_timestamp = env.ledger().timestamp();
 
-        env.storage().instance().set(&(SPENDING_INFO, owner), &spending_info);
+        env.storage()
+            .instance()
+            .set(&(SPENDING_INFO, owner), &spending_info);
     }
 
     /// Evaluate transaction security risk with AI guardrails

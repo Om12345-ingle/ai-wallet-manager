@@ -11,6 +11,7 @@ import Security from '@/components/pages/Security'
 import SmartContracts from '@/components/pages/SmartContracts'
 import Analytics from '@/components/pages/Analytics'
 import Help from '@/components/pages/Help'
+import Feedback from '@/components/pages/Feedback'
 import { useAppContext } from '@/contexts/AppContext'
 
 // Mobile bottom nav items
@@ -72,6 +73,7 @@ export default function Home() {
       case 'security':    return <Security />
       case 'contracts':   return <SmartContracts />
       case 'analytics':   return <Analytics />
+      case 'feedback':    return <Feedback />
       case 'help':        return <Help />
       default:            return <Dashboard />
     }
@@ -105,7 +107,10 @@ export default function Home() {
         {isLoggedIn && activeTab !== 'dashboard' && (
           <div className="md:hidden flex items-center justify-between px-4 py-3 border-b border-white/10 backdrop-blur-xl bg-black/50">
             <button
+              type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label={mobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
+              aria-expanded={mobileMenuOpen}
               className="p-2 rounded-xl bg-white/10 text-white text-lg"
             >
               ☰
@@ -118,8 +123,13 @@ export default function Home() {
         {/* Mobile slide-out menu */}
         {mobileMenuOpen && isLoggedIn && (
           <div className="md:hidden fixed inset-0 z-50 flex">
-            <div className="absolute inset-0 bg-black/60" onClick={() => setMobileMenuOpen(false)} />
-            <div className="relative w-72 bg-gray-900 border-r border-white/15 h-full overflow-y-auto">
+            <button
+              type="button"
+              className="absolute inset-0 bg-black/60"
+              onClick={() => setMobileMenuOpen(false)}
+              aria-label="Close Navigation Menu"
+            />
+            <div className="relative w-72 overscroll-contain bg-gray-900 border-r border-white/15 h-full overflow-y-auto">
               <Navbar
                 activeTab={activeTab}
                 onTabChange={(tab) => { setActiveTab(tab); setMobileMenuOpen(false) }}
@@ -139,19 +149,21 @@ export default function Home() {
 
       {/* ── Mobile Bottom Nav ── */}
       {isLoggedIn && (
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 backdrop-blur-xl bg-black/80 border-t border-white/15">
+        <div className="mobile-safe-bottom md:hidden fixed bottom-0 left-0 right-0 z-40 backdrop-blur-xl bg-black/80 border-t border-white/15">
           <div className="flex items-center justify-around px-2 py-2">
             {mobileNav.map(item => (
               <button
+                type="button"
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
+                aria-current={activeTab === item.id ? 'page' : undefined}
                 className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl transition-all duration-200 ${
                   activeTab === item.id
                     ? 'bg-white/15 text-white'
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
-                <span className="text-xl">{item.icon}</span>
+                <span aria-hidden="true" className="text-xl">{item.icon}</span>
                 <span className="text-xs font-medium">{item.label}</span>
               </button>
             ))}

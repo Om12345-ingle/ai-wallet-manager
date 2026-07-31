@@ -59,7 +59,7 @@ fn test_portfolio_and_target_allocation() {
 
     // Rebalance portfolio
     let trade_count = client.rebalance_portfolio(&owner);
-    assert!(trade_count >= 0);
+    assert_eq!(trade_count, 1);
 }
 
 #[test]
@@ -88,13 +88,8 @@ fn test_swap_pool_and_execution() {
     );
 
     // Create a swap order to exchange 100 XLM for min 9 USDC
-    let order_id = client.create_swap_order(
-        &owner,
-        &xlm_code,
-        &usdc_code,
-        &100_0000000,
-        &9_0000000,
-    );
+    let order_id =
+        client.create_swap_order(&owner, &xlm_code, &usdc_code, &100_0000000, &9_0000000);
 
     assert_eq!(order_id, 1);
 

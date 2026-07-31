@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 interface TransactionHistoryProps {
   publicKey: string
@@ -21,7 +21,7 @@ export default function TransactionHistory({ publicKey }: TransactionHistoryProp
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     if (!publicKey) return
 
     setLoading(true)
@@ -47,11 +47,11 @@ export default function TransactionHistory({ publicKey }: TransactionHistoryProp
     } finally {
       setLoading(false)
     }
-  }
+  }, [publicKey])
 
   useEffect(() => {
     fetchTransactions()
-  }, [publicKey])
+  }, [fetchTransactions])
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -99,7 +99,7 @@ export default function TransactionHistory({ publicKey }: TransactionHistoryProp
           disabled={loading}
           className="kiro-btn kiro-btn-ghost text-sm"
         >
-          {loading ? '⏳ Loading...' : '🔄 Refresh'}
+          {loading ? '⏳ Loading…' : '🔄 Refresh'}
         </button>
       </div>
 

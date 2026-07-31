@@ -1,8 +1,15 @@
 import * as StellarSdk from '@stellar/stellar-sdk'
 
-const RPC_URL = process.env.NEXT_PUBLIC_SOROBAN_RPC_URL || 'https://soroban-testnet.stellar.org'
-const NETWORK_PASSPHRASE = StellarSdk.Networks.TESTNET
-const HORIZON_URL = 'https://horizon-testnet.stellar.org'
+const IS_MAINNET = process.env.NEXT_PUBLIC_STELLAR_NETWORK === 'mainnet'
+const RPC_URL =
+  process.env.NEXT_PUBLIC_SOROBAN_RPC_URL ||
+  (IS_MAINNET
+    ? 'https://stellar-soroban-public.nodies.app'
+    : 'https://soroban-testnet.stellar.org')
+const NETWORK_PASSPHRASE = IS_MAINNET ? StellarSdk.Networks.PUBLIC : StellarSdk.Networks.TESTNET
+const HORIZON_URL = IS_MAINNET
+  ? 'https://horizon.stellar.org'
+  : 'https://horizon-testnet.stellar.org'
 
 export interface SorobanSpendingInfo {
   dailyLimit: number
@@ -39,18 +46,14 @@ export class SorobanContractClient {
   private static horizonServer = new StellarSdk.Horizon.Server(HORIZON_URL)
 
   public static getWalletGuardContractId(): string {
-    return (
-      process.env.NEXT_PUBLIC_CONTRACT_ID ||
-      process.env.SOROBAN_CONTRACT_ID ||
-      'CD5WJ3Q5B7N32A1B4C5D6E7F8G9H0I1J2K3L4M5N6O7P8Q9R0S'
-    )
+    return process.env.NEXT_PUBLIC_CONTRACT_ID || process.env.SOROBAN_CONTRACT_ID || ''
   }
 
   public static getMultiAssetContractId(): string {
     return (
       process.env.NEXT_PUBLIC_MULTI_ASSET_CONTRACT_ID ||
       process.env.MULTI_ASSET_CONTRACT_ID ||
-      'CBX7Y8Z9A0B1C2D3E4F5G6H7I8J9K0L1M2N3O4P5Q6R7S8T9U'
+      ''
     )
   }
 
@@ -114,6 +117,9 @@ export class SorobanContractClient {
     functionName: string,
     args: StellarSdk.xdr.ScVal[] = []
   ): Promise<StellarSdk.Transaction> {
+    if (!contractId) {
+      throw new Error('Soroban contract ID is not configured')
+    }
     const account = await this.horizonServer.loadAccount(publicKey)
     const contract = new StellarSdk.Contract(contractId)
 

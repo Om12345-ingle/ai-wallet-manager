@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 import { useAppContext } from '@/contexts/AppContext'
 
@@ -13,7 +13,7 @@ export default function SmartContracts() {
   const [walletSettings, setWalletSettings] = useState<any>(null)
   const [contractStatus, setContractStatus] = useState<'connected' | 'disconnected'>('disconnected')
 
-  const callSmartContract = async (action: string, params: any = {}) => {
+  const callSmartContract = useCallback(async (action: string, params: any = {}) => {
     setLoading(true)
     try {
       const response = await fetch('/api/stellar/smart-limit', {
@@ -40,9 +40,9 @@ export default function SmartContracts() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [publicKey, secretKey])
 
-  const loadContractStatus = async () => {
+  const loadContractStatus = useCallback(async () => {
     try {
       const result = await callSmartContract('get_spending_info')
       setContractStatus('connected')
@@ -55,13 +55,13 @@ export default function SmartContracts() {
       setContractStatus('disconnected')
       console.error('Failed to load contract status:', error)
     }
-  }
+  }, [callSmartContract])
 
   useEffect(() => {
     if (publicKey) {
       loadContractStatus()
     }
-  }, [publicKey])
+  }, [publicKey, loadContractStatus])
 
   const handleAddContact = async () => {
     if (!contactName || !contactAddress) {

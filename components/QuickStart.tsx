@@ -27,13 +27,7 @@ export default function QuickStart() {
         throw new Error('Failed to generate keys')
       }
     } catch (error) {
-      // Use fallback keys
-      updateWalletKeys(
-        'GDQNY3PBOJOKYZSRMK2S7LHHGWZIUISD4QORETLMXEWXBI7KFZZMKTL3',
-        'SCZANGBA5YHTNYVVV4C3U252E2B6P6F5T3U6MM63WBSBZATAQI3EBTQ4'
-      )
-      localStorage.setItem('connectedWalletType', 'manual')
-      localStorage.setItem('connectedWalletName', 'Demo Keys')
+      console.error('Quick start failed:', error)
     } finally {
       setLoading(false)
     }
@@ -56,7 +50,7 @@ export default function QuickStart() {
           {loading ? (
             <>
               <span className="mr-2">⏳</span>
-              Generating Keys...
+              Generating Keys…
             </>
           ) : (
             <>

@@ -1,17 +1,19 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import MultiAssetPortfolio from '../MultiAssetPortfolio'
 import { useAppContext } from '@/contexts/AppContext'
 import ContractStatus from '@/components/ContractStatus'
+import OnboardingChecklist from '@/components/OnboardingChecklist'
 
 export default function Dashboard() {
   const { state, updateBalance, updateSpendingInfo, setActiveTab } = useAppContext()
   const { publicKey, secretKey, balance, spendingInfo } = state
   const [loading, setLoading] = useState(false)
+  const loadedDashboardFor = useRef('')
   const isMainnet = process.env.NEXT_PUBLIC_STELLAR_NETWORK === 'mainnet'
 
-  const fetchBalance = async () => {
+  const fetchBalance = useCallback(async () => {
     if (!publicKey) return
     setLoading(true)
     try {
@@ -21,15 +23,18 @@ export default function Dashboard() {
         body: JSON.stringify({ publicKey })
       })
       const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data.error || 'Could not load the account balance.')
+      }
       if (data.balance !== undefined) updateBalance(data.balance)
     } catch (error) {
       console.error('Error fetching balance:', error)
     } finally {
       setLoading(false)
     }
-  }
+  }, [publicKey, updateBalance])
 
-  const fetchSpendingInfo = async () => {
+  const fetchSpendingInfo = useCallback(async () => {
     try {
       const response = await fetch('/api/stellar/smart-limit', {
         method: 'POST',
@@ -41,17 +46,25 @@ export default function Dashboard() {
     } catch (error) {
       console.error('Error fetching spending info:', error)
     }
-  }
+  }, [publicKey, secretKey, updateSpendingInfo])
 
   useEffect(() => {
-    if (publicKey) {
+    if (publicKey && loadedDashboardFor.current !== publicKey) {
+      loadedDashboardFor.current = publicKey
       fetchBalance()
       fetchSpendingInfo()
+    } else if (!publicKey) {
+      loadedDashboardFor.current = ''
     }
-  }, [publicKey])
+  }, [publicKey, fetchBalance, fetchSpendingInfo])
 
   return (
     <div className="space-y-6">
+      <OnboardingChecklist
+        publicKey={publicKey}
+        balance={balance}
+        onNavigate={setActiveTab}
+      />
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -59,7 +72,7 @@ export default function Dashboard() {
           <div className="text-2xl mb-2">💰</div>
           <div className="text-xs text-gray-400 mb-1">Balance</div>
           <div className="text-2xl font-bold text-white">
-            {loading ? <span className="animate-pulse text-base">Loading...</span> : `${parseFloat(balance || '0').toFixed(2)} XLM`}
+            {loading ? <span className="animate-pulse text-base">Loading…</span> : `${parseFloat(balance || '0').toFixed(2)} XLM`}
           </div>
         </div>
         <div className="backdrop-blur-xl bg-white/5 border border-white/15 rounded-2xl p-5 hover:scale-105 transition-all duration-300">

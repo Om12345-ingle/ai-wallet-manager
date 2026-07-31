@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAppContext } from '@/contexts/AppContext'
 
 interface SmartContractManagerProps {
@@ -37,7 +37,7 @@ export default function SmartContractManager({ publicKey, secretKey }: SmartCont
   const [contactName, setContactName] = useState('')
   const [contactAddress, setContactAddress] = useState('')
 
-  const callSmartContract = async (action: string, params: any = {}) => {
+  const callSmartContract = useCallback(async (action: string, params: any = {}) => {
     console.log('SmartContract call:', { action, publicKey: publicKey?.slice(0, 8) + '...', hasSecretKey: !!secretKey, params });
     
     if (!publicKey) {
@@ -73,9 +73,9 @@ export default function SmartContractManager({ publicKey, secretKey }: SmartCont
     } finally {
       setLoading(false)
     }
-  }
+  }, [publicKey, secretKey])
 
-  const loadSpendingInfo = async () => {
+  const loadSpendingInfo = useCallback(async () => {
     try {
       const result = await callSmartContract('get_spending_info')
       console.log('Spending info result:', result)
@@ -107,9 +107,9 @@ export default function SmartContractManager({ publicKey, secretKey }: SmartCont
         monthlySpent: 0
       })
     }
-  }
+  }, [callSmartContract])
 
-  const loadWalletSettings = async () => {
+  const loadWalletSettings = useCallback(async () => {
     try {
       const result = await callSmartContract('get_wallet_settings')
       console.log('Wallet settings result:', result)
@@ -138,14 +138,14 @@ export default function SmartContractManager({ publicKey, secretKey }: SmartCont
       })
       setEmergencyContact(publicKey)
     }
-  }
+  }, [callSmartContract, publicKey])
 
   useEffect(() => {
     if (publicKey) {
       loadSpendingInfo()
       loadWalletSettings()
     }
-  }, [publicKey])
+  }, [publicKey, loadSpendingInfo, loadWalletSettings])
 
   const handleSetDailyLimit = async () => {
     console.log('handleSetDailyLimit called with:', dailyLimit);

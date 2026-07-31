@@ -26,14 +26,10 @@ export default function WalletLoginForm() {
         setPublicKey(data.publicKey)
         setSecretKey(data.secretKey)
       } else {
-        // Fallback keys
-        setPublicKey('GDQNY3PBOJOKYZSRMK2S7LHHGWZIUISD4QORETLMXEWXBI7KFZZMKTL3')
-        setSecretKey('SCZANGBA5YHTNYVVV4C3U252E2B6P6F5T3U6MM63WBSBZATAQI3EBTQ4')
+        throw new Error(data.error || 'Could not generate a testnet keypair.')
       }
     } catch (error) {
-      // Fallback keys
-      setPublicKey('GDQNY3PBOJOKYZSRMK2S7LHHGWZIUISD4QORETLMXEWXBI7KFZZMKTL3')
-      setSecretKey('SCZANGBA5YHTNYVVV4C3U252E2B6P6F5T3U6MM63WBSBZATAQI3EBTQ4')
+      setError(error instanceof Error ? error.message : 'Could not generate a testnet keypair.')
     }
   }
 
@@ -117,7 +113,7 @@ export default function WalletLoginForm() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="min-w-0 space-y-8">
       {/* Header */}
       <div className="text-center">
         <h3 className="text-3xl font-extrabold text-white mb-4 tracking-tight">Connect Your Wallet</h3>
@@ -127,7 +123,7 @@ export default function WalletLoginForm() {
       </div>
 
       {error && (
-        <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-300 text-center animate-fade-in-scale font-medium">
+        <div aria-live="polite" className="p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-300 text-center animate-fade-in-scale font-medium">
           ⚠️ {error}
         </div>
       )}
@@ -151,7 +147,7 @@ export default function WalletLoginForm() {
               {connecting ? (
                 <div className="text-yellow-400 font-semibold flex items-center justify-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-yellow-400 animate-ping"></span>
-                  Generating Secure Credentials...
+                  Generating Secure Credentials…
                 </div>
               ) : (
                 <div className="inline-block text-xs px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 font-bold uppercase tracking-wider">
@@ -166,14 +162,14 @@ export default function WalletLoginForm() {
         <button
           onClick={tryFreighter}
           disabled={connecting}
-          className="p-6 rounded-3xl border transition-all duration-300 hover:scale-[1.02] bg-gradient-to-r from-yellow-500/5 via-black/10 to-yellow-500/5 border-yellow-500/20 hover:border-yellow-500/40 hover:bg-yellow-500/10 shadow-md flex items-center justify-between group"
+          className="min-w-0 p-6 rounded-3xl border transition-all duration-300 hover:scale-[1.02] bg-gradient-to-r from-yellow-500/5 via-black/10 to-yellow-500/5 border-yellow-500/20 hover:border-yellow-500/40 hover:bg-yellow-500/10 shadow-md flex items-center justify-between group"
         >
-          <div className="flex items-center gap-4">
+          <div className="min-w-0 flex items-center gap-4">
             <div className="text-4xl group-hover:scale-110 transition-transform duration-300">🚀</div>
-            <div className="flex-1 text-left">
+            <div className="min-w-0 flex-1 text-left">
               <h4 className="text-lg font-bold text-white">Freighter Wallet</h4>
               <p className="text-sm text-gray-400">
-                {connecting ? 'Checking status...' : 'Authorize using your Freighter browser extension'}
+                {connecting ? 'Checking Status…' : 'Authorize using your Freighter browser extension'}
               </p>
             </div>
           </div>
@@ -192,28 +188,36 @@ export default function WalletLoginForm() {
           
           <div className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-gray-300 mb-2 uppercase tracking-wider">
+              <label htmlFor="manual-public-key" className="block text-xs font-bold text-gray-300 mb-2 uppercase tracking-wider">
                 Public Key (Address)
               </label>
               <input
                 type="text"
+                id="manual-public-key"
+                name="publicKey"
+                autoComplete="off"
+                spellCheck={false}
                 value={publicKey}
                 onChange={(e) => setPublicKey(e.target.value)}
                 placeholder="GXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white font-mono text-xs focus:outline-none focus:border-yellow-500/40 transition-all duration-300"
+                className="min-w-0 w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white font-mono text-xs focus:outline-none focus:border-yellow-500/40 transition-all duration-300"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-gray-300 mb-2 uppercase tracking-wider">
+              <label htmlFor="manual-secret-key" className="block text-xs font-bold text-gray-300 mb-2 uppercase tracking-wider">
                 Secret Seed Key
               </label>
               <input
                 type="password"
+                id="manual-secret-key"
+                name="secretKey"
+                autoComplete="off"
+                spellCheck={false}
                 value={secretKey}
                 onChange={(e) => setSecretKey(e.target.value)}
                 placeholder="SXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white font-mono text-xs focus:outline-none focus:border-yellow-500/40 transition-all duration-300"
+                className="min-w-0 w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white font-mono text-xs focus:outline-none focus:border-yellow-500/40 transition-all duration-300"
               />
             </div>
           </div>

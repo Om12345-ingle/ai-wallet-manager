@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 import { useAppContext } from '@/contexts/AppContext'
 
@@ -12,7 +12,7 @@ export default function Security() {
   const [walletSettings, setWalletSettings] = useState<any>(null)
   const isMainnet = process.env.NEXT_PUBLIC_STELLAR_NETWORK === 'mainnet'
 
-  const callSmartContract = async (action: string, params: any = {}) => {
+  const callSmartContract = useCallback(async (action: string, params: any = {}) => {
     setLoading(true)
     try {
       const response = await fetch('/api/stellar/smart-limit', {
@@ -46,9 +46,9 @@ export default function Security() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [publicKey, secretKey])
 
-  const loadSecurityStatus = async () => {
+  const loadSecurityStatus = useCallback(async () => {
     try {
       const spendingResult = await callSmartContract('get_spending_info')
       if (spendingResult.spendingInfo) {
@@ -63,13 +63,13 @@ export default function Security() {
     } catch (error) {
       console.error('Failed to load security status:', error)
     }
-  }
+  }, [callSmartContract, publicKey, setWalletStatus])
 
   useEffect(() => {
     if (publicKey) {
       loadSecurityStatus()
     }
-  }, [publicKey])
+  }, [publicKey, loadSecurityStatus])
 
   const handleFreezeWallet = async () => {
     if (confirm('⚠️ Are you sure you want to FREEZE your wallet?\n\nThis will block ALL transactions until you unfreeze it.')) {

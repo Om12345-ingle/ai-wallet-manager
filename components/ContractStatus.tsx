@@ -98,7 +98,7 @@ export default function ContractStatus() {
       <span className="font-medium">
         {contractInfo.status === 'connected' ? 'Real Contract' : 
          contractInfo.status === 'simulation' ? 'Simulation' : 
-         contractInfo.status === 'loading' ? 'Loading...' : 'Error'}
+         contractInfo.status === 'loading' ? 'Loading…' : 'Error'}
       </span>
       {contractInfo.contractId && (
         <span className="opacity-70">

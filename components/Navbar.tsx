@@ -16,6 +16,7 @@ const navItems = [
   { id: 'security', label: 'Security', icon: '🔒' },
   { id: 'contracts', label: 'Smart Contracts', icon: '📋' },
   { id: 'analytics', label: 'Analytics', icon: '📊' },
+  { id: 'feedback', label: 'Feedback', icon: '💬' },
   { id: 'help', label: 'Help', icon: '❓' }
 ]
 
@@ -36,10 +37,12 @@ export default function Navbar({ activeTab, onTabChange, publicKey }: NavbarProp
               </div>
             )}
             <button
+              type="button"
               onClick={() => setIsCollapsed(!isCollapsed)}
+              aria-label={isCollapsed ? 'Expand Navigation' : 'Collapse Navigation'}
               className="kiro-btn-ghost p-3 rounded-xl hover:bg-white/10 transition-all duration-300 hover:scale-110"
             >
-              <span className="text-lg">{isCollapsed ? '→' : '←'}</span>
+              <span aria-hidden="true" className="text-lg">{isCollapsed ? '→' : '←'}</span>
             </button>
           </div>
         </div>
@@ -70,8 +73,11 @@ export default function Navbar({ activeTab, onTabChange, publicKey }: NavbarProp
         <div className="flex-1 p-4 space-y-2">
           {navItems.map((item, index) => (
             <button
+              type="button"
               key={item.id}
               onClick={() => onTabChange(item.id)}
+              aria-current={activeTab === item.id ? 'page' : undefined}
+              aria-label={isCollapsed ? item.label : undefined}
               className={`w-full flex items-center space-x-4 px-4 py-4 rounded-2xl transition-all duration-300 group relative overflow-hidden ${
                 activeTab === item.id
                   ? 'bg-gradient-to-r from-yellow-500/10 via-black/20 to-yellow-500/5 border border-yellow-500/35 shadow-lg shadow-yellow-500/5'
@@ -79,7 +85,7 @@ export default function Navbar({ activeTab, onTabChange, publicKey }: NavbarProp
               }`}
               style={{animationDelay: `${index * 0.1}s`}}
             >
-              <div className={`text-xl flex-shrink-0 transition-transform duration-300 ${
+              <div aria-hidden="true" className={`text-xl flex-shrink-0 transition-transform duration-300 ${
                 activeTab === item.id ? 'scale-110 text-yellow-400' : 'group-hover:scale-110'
               }`}>
                 {item.icon}

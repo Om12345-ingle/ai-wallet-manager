@@ -342,7 +342,12 @@ impl MultiAssetManager {
     }
 
     /// Constant product calculation: (dx * y * (10000 - fee)) / (x * 10000 + dx * (10000 - fee))
-    fn calculate_swap_amount(amount_in: i128, reserve_in: i128, reserve_out: i128, fee_rate: u32) -> i128 {
+    fn calculate_swap_amount(
+        amount_in: i128,
+        reserve_in: i128,
+        reserve_out: i128,
+        fee_rate: u32,
+    ) -> i128 {
         let fee_multiplier = (10000 - fee_rate) as i128;
         let amount_in_with_fee = amount_in * fee_multiplier;
         let numerator = amount_in_with_fee * reserve_out;

@@ -5,24 +5,35 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      deploy_network:
+        description: Deploy both Soroban contracts after tests pass
+        required: true
+        default: none
+        type: choice
+        options:
+          - none
+          - testnet
+          - mainnet
 
 jobs:
-  smart-contract-ci-cd:
-    name: Smart Contract CI/CD (Rust & Soroban)
+  smart-contract-ci:
+    name: Smart Contract CI (Rust & Soroban)
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: wasm32-unknown-unknown
+          targets: wasm32v1-none
           components: clippy, rustfmt
 
       - name: Cache Cargo Dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.cargo/registry
@@ -30,42 +41,68 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock', '**/Cargo.toml') }}
 
-      - name: Lock ed25519-dalek version
-        run: cargo update -p ed25519-dalek:3.0.0 --precise 2.2.0 || true
-
       - name: Check Rust Code Format
-        run: cargo fmt --all --check || true
+        run: cargo fmt --all --check
 
       - name: Run Smart Contract Unit Tests
-        run: cargo test
+        run: cargo test --workspace
 
       - name: Build WASM Contracts
-        run: |
-          cargo build --target wasm32-unknown-unknown --release --manifest-path contracts/wallet-guard/Cargo.toml
-          cargo build --target wasm32-unknown-unknown --release --manifest-path contracts/multi-asset-manager/Cargo.toml
+        run: cargo build --workspace --target wasm32v1-none --release
 
-      - name: Deploy Smart Contracts to Stellar Testnet (CD)
-        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: |
-          echo "🌐 Executing Smart Contract Deployment to Stellar Testnet..."
-          if command -v soroban &> /dev/null; then
-            echo "Soroban CLI present for deployment"
-          else
-            echo "Simulating contract deployment step for CD pipeline"
-          fi
-
-  frontend-ci-cd:
-    name: Frontend CI/CD (Next.js & Vercel)
+  smart-contract-cd:
+    name: Smart Contract CD (credential-gated)
     runs-on: ubuntu-latest
-    needs: smart-contract-ci-cd
-    if: always()
+    needs: smart-contract-ci
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy_network != 'none'
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32v1-none
+
+      - name: Install Stellar CLI
+        run: cargo install --locked stellar-cli --version 25.1.0
+
+      - name: Deploy Soroban contracts
+        env:
+          DEPLOY_NETWORK: ${{ inputs.deploy_network }}
+          TESTNET_SIGNER: ${{ secrets.STELLAR_TESTNET_SECRET_KEY }}
+          MAINNET_SIGNER: ${{ secrets.STELLAR_MAINNET_SECRET_KEY }}
+          TESTNET_SIGNER_ADDRESS: ${{ vars.STELLAR_TESTNET_DEPLOYER }}
+          MAINNET_SIGNER_ADDRESS: ${{ vars.STELLAR_MAINNET_DEPLOYER }}
+        run: |
+          if [ "$DEPLOY_NETWORK" = "testnet" ]; then
+            signer="$TESTNET_SIGNER"
+            signer_address="$TESTNET_SIGNER_ADDRESS"
+          else
+            signer="$MAINNET_SIGNER"
+            signer_address="$MAINNET_SIGNER_ADDRESS"
+          fi
+          if [ -z "$signer" ] || [ -z "$signer_address" ]; then
+            echo "Missing Stellar signer secret or public deployer variable for $DEPLOY_NETWORK" >&2
+            exit 1
+          fi
+          echo "::add-mask::$signer"
+          STELLAR_SOURCE="$signer" STELLAR_SOURCE_ADDRESS="$signer_address" \
+            ALLOW_MAINNET_DEPLOY=true \
+            ./scripts/deploy-soroban.sh "$DEPLOY_NETWORK"
+
+  frontend-ci:
+    name: Frontend CI (Next.js)
+    runs-on: ubuntu-latest
+    needs: smart-contract-ci
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'npm'
@@ -74,7 +111,7 @@ jobs:
         run: npm ci --legacy-peer-deps
 
       - name: Run TypeScript type check
-        run: npx tsc --noEmit
+        run: npm run typecheck
 
       - name: Run tests
         run: npm test
@@ -83,13 +120,18 @@ jobs:
         run: npm run build
         env:
           STELLAR_PUBLIC_KEY: ${{ secrets.STELLAR_PUBLIC_KEY || 'GCYLWUJI2USHF7DRQYCBOVDMRT3Z7F6WINN3RIMJ7T5X5G7ZPU53G5B2' }}
-          STELLAR_SECRET_KEY: ${{ secrets.STELLAR_SECRET_KEY || 'placeholder' }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || '' }}
-          NEXT_PUBLIC_CONTRACT_ID: ${{ secrets.NEXT_PUBLIC_CONTRACT_ID || '' }}
-          NEXT_PUBLIC_MULTI_ASSET_CONTRACT_ID: ${{ secrets.NEXT_PUBLIC_MULTI_ASSET_CONTRACT_ID || '' }}
+          NEXT_PUBLIC_STELLAR_NETWORK: testnet
+          NEXT_PUBLIC_CONTRACT_ID: CBLWIUQGJU24KFXGYT62FO7ELDYUE3QTDB2OOYPRNTHPJC4KVNSFG7DQ
+          NEXT_PUBLIC_MULTI_ASSET_CONTRACT_ID: CAVYUCHMTSTCRMBKHLWPNBK73BWMTSBU3CDE3EMVDSRNKXCC632P4CXD
 
       - name: Deploy to Vercel (Frontend CD)
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
-          npm install -g vercel@latest
-          vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --yes || true
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::warning::VERCEL_TOKEN is not configured; production deployment skipped."
+            exit 0
+          fi
+          npx vercel@latest deploy --prod --token="$VERCEL_TOKEN" --yes

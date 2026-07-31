@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useAppContext } from '@/contexts/AppContext'
 import WalletLoginForm from './WalletLoginForm'
 
@@ -9,8 +9,9 @@ export default function WalletHeader() {
   const { publicKey, secretKey, balance } = state
   const [loading, setLoading] = useState(false)
   const [connectedWalletName, setConnectedWalletName] = useState('')
+  const loadedBalanceFor = useRef('')
 
-  const fetchBalance = async () => {
+  const fetchBalance = useCallback(async () => {
     if (!publicKey) return
     
     setLoading(true)
@@ -22,6 +23,9 @@ export default function WalletHeader() {
       })
       
       const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data.error || 'Could not load the account balance.')
+      }
       if (data.balance !== undefined) {
         updateBalance(data.balance)
       }
@@ -30,17 +34,22 @@ export default function WalletHeader() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [publicKey, updateBalance])
 
   useEffect(() => {
-    fetchBalance()
+    if (publicKey && loadedBalanceFor.current !== publicKey) {
+      loadedBalanceFor.current = publicKey
+      fetchBalance()
+    } else if (!publicKey) {
+      loadedBalanceFor.current = ''
+    }
     
     // Load connected wallet info
     const walletName = localStorage.getItem('connectedWalletName')
     if (walletName) {
       setConnectedWalletName(walletName)
     }
-  }, [publicKey])
+  }, [publicKey, fetchBalance])
 
   const handleDisconnect = () => {
     resetState()
@@ -57,15 +66,15 @@ export default function WalletHeader() {
       {/* Background Effects */}
       <div className="absolute inset-0 bg-gradient-to-r from-white/5 via-black/10 to-white/5 rounded-3xl blur-xl"></div>
       
-      <div className={`relative backdrop-blur-xl bg-gradient-to-r from-white/10 via-black/5 to-white/10 border border-white/15 rounded-3xl shadow-2xl animate-slide-in-up ${
-        isLoginPage ? 'p-8 max-w-4xl mx-auto' : 'p-6'
+      <div className={`relative min-w-0 w-full backdrop-blur-xl bg-gradient-to-r from-white/10 via-black/5 to-white/10 border border-white/15 rounded-3xl shadow-2xl animate-slide-in-up ${
+        isLoginPage ? 'p-4 sm:p-8 max-w-4xl mx-auto' : 'p-4 sm:p-6'
       }`}>
         {/* Login Page Header */}
         {isLoginPage && (
           <div className="text-center mb-8">
-            <div className="flex items-center justify-center gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-6">
               <div className="text-5xl animate-float-gentle">🤖</div>
-              <h1 className="text-4xl font-bold text-white">AI Wallet Manager</h1>
+              <h1 className="text-3xl sm:text-4xl font-bold text-white">AI Wallet Manager</h1>
             </div>
             <p className="text-xl text-gray-300 mb-6">
               Connect your Stellar {isMainnet ? 'mainnet' : 'testnet'} wallet to unlock AI-powered management
@@ -164,7 +173,7 @@ export default function WalletHeader() {
                     <p className="text-sm font-medium text-gray-300 mb-1">Balance</p>
                     <p className="text-2xl font-bold text-white">
                       {loading ? (
-                        <span className="animate-pulse">Loading...</span>
+                        <span className="animate-pulse">Loading…</span>
                       ) : (
                         `${balance} XLM`
                       )}

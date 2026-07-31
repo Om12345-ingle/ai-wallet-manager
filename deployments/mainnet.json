@@ -1,0 +1,10 @@
+{
+  "project": "AI Wallet Manager",
+  "network": "mainnet",
+  "status": "awaiting-funded-mainnet-deployer",
+  "contracts": {
+    "walletGuard": null,
+    "multiAssetManager": null
+  },
+  "confirmedTransactions": []
+}

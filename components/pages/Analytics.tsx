@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import TransactionHistory from '../TransactionHistory'
 import { useAppContext } from '@/contexts/AppContext'
 
@@ -34,7 +34,7 @@ export default function Analytics() {
   const [hoveredAsset, setHoveredAsset] = useState<Asset | null>(null)
   const [hoveredPoint, setHoveredPoint] = useState<any | null>(null)
 
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     setLoading(true)
     try {
       // 1. Get spending analytics
@@ -109,13 +109,13 @@ export default function Analytics() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [publicKey, secretKey])
 
   useEffect(() => {
     if (publicKey) {
       fetchAnalytics()
     }
-  }, [publicKey])
+  }, [publicKey, fetchAnalytics])
 
   const getSpendingPercentage = (spent: number, limit: number) => {
     if (!limit || limit <= 0) return 0

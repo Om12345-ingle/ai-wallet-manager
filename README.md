@@ -21,7 +21,30 @@ An AI-powered wallet management application built on the **Stellar blockchain**,
 
 ## 🌐 Live Demo
 
-**[https://omyaingle-patd1nve9-neelpote44-7832s-projects.vercel.app](https://omyaingle-patd1nve9-neelpote44-7832s-projects.vercel.app)**
+**[https://omyaingle.vercel.app](https://omyaingle.vercel.app)**
+
+This release integrates Vercel Web Analytics, Speed Insights, first-run
+onboarding, and an in-product feedback form. The existing production deployment
+is online; the current local readiness update must be published before those
+new additions appear at the live URL.
+
+## Product Evidence
+
+| Desktop onboarding | Mobile onboarding |
+|---|---|
+| ![Desktop wallet onboarding](docs/screenshots/01-desktop-onboarding.png) | ![Mobile wallet onboarding](docs/screenshots/02-mobile-onboarding.png) |
+
+| Responsive dashboard | Monitoring and feedback |
+|---|---|
+| ![Connected dashboard and onboarding checklist](docs/screenshots/04-desktop-dashboard.png) | ![Feedback collection with analytics monitoring](docs/screenshots/05-feedback-monitoring.png) |
+
+Additional evidence:
+
+- [Mobile connected dashboard](docs/screenshots/03-mobile-dashboard.png)
+- [Verified feedback receipt](docs/screenshots/06-feedback-receipt.png)
+- [Production readiness matrix](docs/PRODUCTION_READINESS.md)
+- [Consent-based wallet interaction template](docs/user-wallet-interactions.csv)
+- [Live demo recording script](docs/DEMO_SCRIPT.md)
 
 ---
 google docs link - https://docs.google.com/spreadsheets/d/1Fy0MHt8JeNQrlyHyKJqUPEF3bupMbKvlBDsOAh3Yy44/edit?usp=sharing
@@ -50,7 +73,7 @@ google docs link - https://docs.google.com/spreadsheets/d/1Fy0MHt8JeNQrlyHyKJqUP
 Test Suites: 3 passed, 3 total
 Tests:       52 passed, 52 total
 Snapshots:   0 total
-Time:        4.737 s
+Time:        5.8 s
 ```
 
 Run tests locally:
@@ -60,20 +83,31 @@ npm test
 
 ---
 
-## 🔗 On-Chain Activity (Stellar Testnet)
+## 🔗 Verified On-Chain Deployment
 
-**Wallet Address:**
-```
-GCYLWUJI2USHF7DRQYCBOVDMRT3Z7F6WINN3RIMJ7T5X5G7ZPU53G5B2
-```
+The repository contains two real Soroban contracts deployed on Stellar
+testnet. The deployment record and all confirmed transaction hashes are
+versioned in [`deployments/testnet.json`](deployments/testnet.json), with an
+upload-ready [`testnet traction CSV`](deployments/testnet-traction.csv).
 
-**Funding Transaction (Friendbot):**
-```
-6ee7e9670e3d7c2b2d9e40aa7fd2813d49f17a6becddac7788f823e7f16bf7fe
-```
-🔍 [View on Stellar Expert](https://stellar.expert/explorer/testnet/tx/6ee7e9670e3d7c2b2d9e40aa7fd2813d49f17a6becddac7788f823e7f16bf7fe)
+| Submission field | Verified value |
+|---|---|
+| Project Name | AI Wallet Manager |
+| GitHub Repo | https://github.com/Om12345-ingle/ai-wallet-manager |
+| Mainnet Transactions | 0 — awaiting a funded mainnet deployment signer |
+| Mainnet Contract Address | Not deployed yet |
+| Testnet Traction | 9 confirmed deployment/configuration transactions |
+| Testnet Wallet Guard | [`CBLWIUQGJU24KFXGYT62FO7ELDYUE3QTDB2OOYPRNTHPJC4KVNSFG7DQ`](https://stellar.expert/explorer/testnet/contract/CBLWIUQGJU24KFXGYT62FO7ELDYUE3QTDB2OOYPRNTHPJC4KVNSFG7DQ) |
+| Testnet Multi Asset Manager | [`CAVYUCHMTSTCRMBKHLWPNBK73BWMTSBU3CDE3EMVDSRNKXCC632P4CXD`](https://stellar.expert/explorer/testnet/contract/CAVYUCHMTSTCRMBKHLWPNBK73BWMTSBU3CDE3EMVDSRNKXCC632P4CXD) |
 
-**Network:** Stellar Testnet (Horizon: `https://horizon-testnet.stellar.org`)
+Key proof transactions:
+
+- [Wallet Guard deployment](https://stellar.expert/explorer/testnet/tx/7ef4826b57a38c59e4635f2fc7d0276b9566704382670e69adaff083104de211)
+- [Multi Asset Manager deployment](https://stellar.expert/explorer/testnet/tx/35a4d1f8c2cc60ebf1a333ddc242452167095d581b80b5f95f47ae287e67e5bc)
+- [Wallet Guard initialization](https://stellar.expert/explorer/testnet/tx/165958094f3d940093489e3f05167e2d51b7ad88793695eb72c92303d8e09d29)
+- [Multi Asset Manager initialization](https://stellar.expert/explorer/testnet/tx/a53ceedb62a1eac9abfdb230ab22307079e0aaab6ca53ac63c21278a89b29368)
+
+Copy-ready judge submission data is available in [`SUBMISSION.md`](SUBMISSION.md).
 
 **Supported Assets & Issuers:**
 
@@ -112,13 +146,13 @@ AI Wallet Manager is a production-ready dApp on the **Stellar Testnet** that com
 
 | Requirement | Status | Details |
 |---|---|---|
-| Advanced smart contracts | ✅ | Soroban-ready spending limits, wallet freeze, contact management |
-| Production-ready app | ✅ | Deployed on Vercel with CI/CD pipeline |
+| Advanced smart contracts | ✅ | Deployed Soroban spending limits, wallet freeze, contacts, and multi-asset management |
+| Production-ready app | ✅ | Existing Vercel deployment plus a locally verified release ready to publish |
 | Multi-asset support | ✅ | XLM, USDC, EURC, AQUA, YBX |
 | Token swapping | ✅ | Path payment via Stellar DEX |
 | Trustline management | ✅ | Auto-detect and create trustlines |
-| Real on-chain transactions | ✅ | Live on Stellar Testnet |
-| CI/CD pipeline | ✅ | GitHub Actions → Vercel auto-deploy |
+| Real on-chain transactions | ✅ | 9 verified contract deployment/configuration transactions on Stellar testnet |
+| CI/CD pipeline | ✅ | GitHub Actions tests/builds; credential-gated Stellar and Vercel deployments |
 | Clean architecture | ✅ | Next.js App Router, typed APIs, context state |
 | README documentation | ✅ | This document |
 
@@ -161,7 +195,7 @@ AI Wallet Manager is a production-ready dApp on the **Stellar Testnet** that com
 
 | Layer | Technology |
 |---|---|
-| Frontend | Next.js 14, React 18, TypeScript |
+| Frontend | Next.js 15.5, React 19, TypeScript |
 | Styling | Tailwind CSS |
 | Blockchain | Stellar SDK, Soroban Smart Contracts |
 | AI | Google Gemini 1.5 Flash + regex fast-path |
@@ -223,8 +257,8 @@ Push to main
            │ (on success)
            ▼
 ┌─────────────────────┐
-│  Deploy to Vercel   │
-│  (Production)       │
+│ Deploy to Vercel if │
+│ token is configured │
 └─────────────────────┘
 ```
 
@@ -239,8 +273,8 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with: { node-version: '20', cache: 'npm' }
       - run: npm ci --legacy-peer-deps
       - run: npx tsc --noEmit
@@ -251,10 +285,13 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
-      - uses: actions/checkout@v4
-      - run: npm install -g vercel@latest
-      - run: vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} --yes
+      - uses: actions/checkout@v6
+      - run: npx vercel@latest deploy --prod --token="$VERCEL_TOKEN" --yes
 ```
+
+The Soroban workflow also runs Rust formatting, seven contract tests, and both
+WASM builds. Contract deployment is manual and signer-gated so CI never embeds
+private keys.
 
 ---
 
@@ -279,7 +316,9 @@ Open [http://localhost:3000](http://localhost:3000)
 STELLAR_PUBLIC_KEY=G...
 STELLAR_SECRET_KEY=S...
 GEMINI_API_KEY=...           # Google Gemini AI (strongly recommended)
-NEXT_PUBLIC_CONTRACT_ID=C... # Soroban contract (optional)
+NEXT_PUBLIC_STELLAR_NETWORK=testnet
+NEXT_PUBLIC_CONTRACT_ID=CBLWIUQGJU24KFXGYT62FO7ELDYUE3QTDB2OOYPRNTHPJC4KVNSFG7DQ
+NEXT_PUBLIC_MULTI_ASSET_CONTRACT_ID=CAVYUCHMTSTCRMBKHLWPNBK73BWMTSBU3CDE3EMVDSRNKXCC632P4CXD
 ```
 
 ---

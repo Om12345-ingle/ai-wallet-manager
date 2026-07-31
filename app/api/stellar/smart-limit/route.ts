@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { SorobanContractClient } from '@/lib/soroban';
 
 // Check if we should use real contract or simulation
-const USE_REAL_CONTRACT = process.env.SOROBAN_CONTRACT_ID && process.env.SOROBAN_CONTRACT_ID !== '';
+const USE_REAL_CONTRACT = Boolean(
+  process.env.SOROBAN_CONTRACT_ID || process.env.NEXT_PUBLIC_CONTRACT_ID
+);
 
 // Simulated smart contract storage (fallback when real contract is not available)
 const smartContractStorage = new Map();
