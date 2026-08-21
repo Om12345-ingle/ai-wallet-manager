@@ -54,8 +54,7 @@ two shipped improvements:
   50-interaction goal and the 2–3 minute interval rule, with Stellar Expert links
   and judge-ready CSV export.
 
-The exact implementation commit link will be added here immediately after the
-owner-authored release commit is created.
+Implementation: [`e86dd17` — add Level 5 growth validation toolkit](https://github.com/Om12345-ingle/ai-wallet-manager/commit/e86dd17).
 
 ## Product Evidence
 

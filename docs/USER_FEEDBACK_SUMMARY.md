@@ -42,3 +42,10 @@ Report these values after collection:
 - selected product change and its Git commit link.
 
 No participant response has been invented for this document.
+
+## Released Iteration
+
+Prior reviewer feedback about onboarding clarity, wallet safety, and submission
+evidence led to watch-only access and the Activity Proof workspace. The
+implementation is traceable to commit
+[`e86dd17`](https://github.com/Om12345-ingle/ai-wallet-manager/commit/e86dd17).
