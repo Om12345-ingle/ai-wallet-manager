@@ -81,6 +81,7 @@ const validTabs = new Set([
   'security',
   'contracts',
   'analytics',
+  'activity',
   'feedback',
   'help',
 ])

@@ -12,6 +12,7 @@ import SmartContracts from '@/components/pages/SmartContracts'
 import Analytics from '@/components/pages/Analytics'
 import Help from '@/components/pages/Help'
 import Feedback from '@/components/pages/Feedback'
+import ActivityProof from '@/components/pages/ActivityProof'
 import { useAppContext } from '@/contexts/AppContext'
 
 // Mobile bottom nav items
@@ -73,6 +74,7 @@ export default function Home() {
       case 'security':    return <Security />
       case 'contracts':   return <SmartContracts />
       case 'analytics':   return <Analytics />
+      case 'activity':    return <ActivityProof />
       case 'feedback':    return <Feedback />
       case 'help':        return <Help />
       default:            return <Dashboard />

@@ -16,6 +16,7 @@ const navItems = [
   { id: 'security', label: 'Security', icon: '🔒' },
   { id: 'contracts', label: 'Smart Contracts', icon: '📋' },
   { id: 'analytics', label: 'Analytics', icon: '📊' },
+  { id: 'activity', label: 'Activity Proof', icon: '🧾' },
   { id: 'feedback', label: 'Feedback', icon: '💬' },
   { id: 'help', label: 'Help', icon: '❓' }
 ]

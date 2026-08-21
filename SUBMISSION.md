@@ -8,6 +8,8 @@
 | GitHub Repo | https://github.com/Om12345-ingle/ai-wallet-manager |
 | Live Demo | https://omyaingle.vercel.app |
 | Demo Video | Pending final human recording and upload |
+| Level 5 Pitch Deck | [`docs/AI-Wallet-Manager-Level-5-Pitch.pptx`](docs/AI-Wallet-Manager-Level-5-Pitch.pptx) |
+| Feedback Workbook | [`docs/level-5-user-feedback.xlsx`](docs/level-5-user-feedback.xlsx) |
 | Mainnet Transactions | 0 — mainnet deployment is awaiting a funded signer |
 | Mainnet Contract Address | Not deployed yet |
 | Testnet Traction | 9 confirmed project deployment/configuration transactions |
@@ -33,14 +35,18 @@ The form-ready CSV is
 - [Mobile connected dashboard](docs/screenshots/03-mobile-dashboard.png)
 - [Analytics and monitoring setup](docs/screenshots/05-feedback-monitoring.png)
 - [Feedback flow receipt](docs/screenshots/06-feedback-receipt.png)
+- [Level 5 on-chain Activity Proof](docs/screenshots/07-level5-activity-proof.png)
 - [User-wallet interaction CSV template](docs/user-wallet-interactions.csv)
 - [Basic feedback summary](docs/USER_FEEDBACK_SUMMARY.md)
 - [Demo recording script](docs/DEMO_SCRIPT.md)
+- [Level 5 growth and validation plan](docs/LEVEL5_GROWTH_PLAN.md)
+- [Professional pitch deck](docs/AI-Wallet-Manager-Level-5-Pitch.pptx)
+- [Feedback and interaction workbook](docs/level-5-user-feedback.xlsx)
 
-The 10-real-user wallet rows and public demo-video URL are intentionally not
-fabricated. They must be added after the participant study and recording. The
-current local release is verified but has not been pushed or deployed at the
-user's instruction.
+The required 50 real wallet interactions and public demo-video URL are
+intentionally not fabricated. They must be added after the participant study and
+recording. Google Forms was skipped at the project owner's request; the workbook
+is ready for consented response import or manual entry.
 
 ## Mainnet readiness
 

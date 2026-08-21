@@ -41,14 +41,10 @@ export default function FreighterWalletConnector() {
         setPublicKey(data.publicKey)
         setSecretKey(data.secretKey)
       } else {
-        // Fallback keys
-        setPublicKey('GDQNY3PBOJOKYZSRMK2S7LHHGWZIUISD4QORETLMXEWXBI7KFZZMKTL3')
-        setSecretKey('SCZANGBA5YHTNYVVV4C3U252E2B6P6F5T3U6MM63WBSBZATAQI3EBTQ4')
+        throw new Error(data.error || 'Could not generate a testnet keypair.')
       }
     } catch (error) {
-      // Fallback keys
-      setPublicKey('GDQNY3PBOJOKYZSRMK2S7LHHGWZIUISD4QORETLMXEWXBI7KFZZMKTL3')
-      setSecretKey('SCZANGBA5YHTNYVVV4C3U252E2B6P6F5T3U6MM63WBSBZATAQI3EBTQ4')
+      setError(error instanceof Error ? error.message : 'Could not generate a testnet keypair.')
     }
   }
 

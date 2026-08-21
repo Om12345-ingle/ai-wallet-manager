@@ -112,14 +112,10 @@ export default function WalletConnector() {
         setManualPublicKey(data.publicKey)
         setManualSecretKey(data.secretKey)
       } else {
-        // Fallback to working demo keys
-        setManualPublicKey('GDQNY3PBOJOKYZSRMK2S7LHHGWZIUISD4QORETLMXEWXBI7KFZZMKTL3')
-        setManualSecretKey('SCZANGBA5YHTNYVVV4C3U252E2B6P6F5T3U6MM63WBSBZATAQI3EBTQ4')
+        throw new Error(data.error || 'Could not generate a testnet keypair.')
       }
     } catch (error) {
-      // Fallback to working demo keys
-      setManualPublicKey('GDQNY3PBOJOKYZSRMK2S7LHHGWZIUISD4QORETLMXEWXBI7KFZZMKTL3')
-      setManualSecretKey('SCZANGBA5YHTNYVVV4C3U252E2B6P6F5T3U6MM63WBSBZATAQI3EBTQ4')
+      setError(error instanceof Error ? error.message : 'Could not generate a testnet keypair.')
     }
   }
 

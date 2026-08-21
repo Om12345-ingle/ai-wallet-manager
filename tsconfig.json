@@ -31,8 +31,18 @@
   },
   "include": [
     "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    "components/**/*.ts",
+    "components/**/*.tsx",
+    "contexts/**/*.ts",
+    "contexts/**/*.tsx",
+    "hooks/**/*.ts",
+    "hooks/**/*.tsx",
+    "lib/**/*.ts",
+    "types/**/*.d.ts",
+    "__tests__/**/*.ts",
+    "middleware.ts",
     ".next/types/**/*.ts"
   ],
   "exclude": [

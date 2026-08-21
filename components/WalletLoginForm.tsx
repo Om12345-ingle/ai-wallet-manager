@@ -57,6 +57,17 @@ export default function WalletLoginForm() {
     localStorage.setItem('connectedWalletName', 'Manual Entry')
   }
 
+  const connectWatchOnly = () => {
+    setError(null)
+    if (!publicKey.startsWith('G') || publicKey.length !== 56) {
+      setError('Enter a valid 56-character Stellar public address for watch-only access.')
+      return
+    }
+    updateWalletKeys(publicKey, '')
+    localStorage.setItem('connectedWalletType', 'watch-only')
+    localStorage.setItem('connectedWalletName', 'Watch-Only Address')
+  }
+
   const quickStart = async () => {
     setConnecting(true)
     
@@ -240,6 +251,17 @@ export default function WalletLoginForm() {
               </button>
             )}
           </div>
+          <button
+            type="button"
+            onClick={connectWatchOnly}
+            disabled={!publicKey || connecting}
+            className="w-full rounded-xl border border-blue-400/20 bg-blue-500/10 px-5 py-3 text-sm font-semibold text-blue-100 transition-colors hover:bg-blue-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            👁 Open Watch-Only — No Secret Seed Required
+          </button>
+          <p className="text-center text-xs leading-5 text-gray-500">
+            Watch-only mode can view balances, analytics and proof. It cannot sign transactions.
+          </p>
         </div>
       </div>
 

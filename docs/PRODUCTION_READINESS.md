@@ -6,7 +6,7 @@ Last verified: 31 July 2026
 
 | Requirement | Status | Evidence |
 |---|---|---|
-| Functional production-ready MVP | Complete | Production build, 52 frontend tests, 7 Soroban tests |
+| Functional production-ready MVP | Complete | Production build, 54 frontend tests, 7 Soroban tests |
 | Stable frontend and contract architecture | Complete | Next.js App Router, typed API routes, two Rust/Soroban contracts |
 | Mobile-responsive UI | Complete | Responsive navigation, safe-area support, [`screenshots/02-mobile-onboarding.png`](screenshots/02-mobile-onboarding.png) and [`screenshots/03-mobile-dashboard.png`](screenshots/03-mobile-dashboard.png) |
 | Loading states and error handling | Complete | Wallet, portfolio, history, feedback, contract, and analytics flows |

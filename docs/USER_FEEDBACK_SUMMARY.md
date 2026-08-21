@@ -26,9 +26,19 @@ Six issues were captured in the project review sheet and addressed:
 | Contacts | Users could not save recipients | Added contact management |
 | Payments | Sending to a friend was unclear | Added contact-based send actions and guided chat |
 
-## Current Baseline
+## Level 5 Collection Status
 
-The collection mechanism is production-ready. A final submission summary should
-be updated after 10 real participants complete the onboarding study. Report the
-response count, average rating, most common positive theme, most common friction
-point, and the next product change—without inventing responses.
+The in-product collection mechanism and the formula-driven
+[`level-5-user-feedback.xlsx`](level-5-user-feedback.xlsx) workbook are ready.
+Google Forms was intentionally skipped at the project owner's request. The final
+summary will be updated only after the real 50-wallet study.
+
+Report these values after collection:
+
+- response count and average rating;
+- number of confirmed and verified transactions;
+- compliance with the 2–3 minute interaction interval;
+- most common positive theme and friction point;
+- selected product change and its Git commit link.
+
+No participant response has been invented for this document.

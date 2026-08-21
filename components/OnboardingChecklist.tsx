@@ -15,11 +15,13 @@ export default function OnboardingChecklist({
 }: OnboardingChecklistProps) {
   const [exploredFeature, setExploredFeature] = useState(false)
   const [feedbackShared, setFeedbackShared] = useState(false)
+  const [activityVerified, setActivityVerified] = useState(false)
 
   useEffect(() => {
     const refresh = () => {
       setExploredFeature(localStorage.getItem('onboarding-core-feature') === 'complete')
       setFeedbackShared(Boolean(localStorage.getItem('latest-feedback-receipt')))
+      setActivityVerified(Boolean(localStorage.getItem('activity-proof-viewed')))
     }
     refresh()
     window.addEventListener('onboarding-progress', refresh)
@@ -35,6 +37,7 @@ export default function OnboardingChecklist({
     { label: 'Connect A Stellar Wallet', complete: Boolean(publicKey) },
     { label: 'Fund & Verify The Account', complete: funded },
     { label: 'Explore A Core Wallet Feature', complete: exploredFeature },
+    { label: 'Verify Real Ledger Activity', complete: activityVerified },
     { label: 'Share Product Feedback', complete: feedbackShared },
   ]
   const completed = steps.filter((step) => step.complete).length
@@ -116,6 +119,13 @@ export default function OnboardingChecklist({
             Share Feedback
           </button>
         )}
+        <button
+          type="button"
+          onClick={() => onNavigate('activity')}
+          className="rounded-xl border border-blue-400/25 bg-blue-500/10 px-4 py-3 text-sm font-semibold text-blue-100 transition-colors hover:bg-blue-500/20 focus-visible:ring-2 focus-visible:ring-blue-300"
+        >
+          Open Activity Proof
+        </button>
       </div>
     </section>
   )

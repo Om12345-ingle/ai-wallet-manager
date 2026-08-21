@@ -126,7 +126,7 @@ export default function Help() {
                   <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-sm">1</div>
                   <div>
                     <h4 className="font-semibold text-white">Connect Your Wallet</h4>
-                    <p className="text-sm text-gray-400">Enter your Stellar testnet public and secret keys in the wallet header</p>
+                    <p className="text-sm text-gray-400">Use Freighter to sign, or enter a public address for safe watch-only review</p>
                   </div>
                 </div>
                 

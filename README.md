@@ -1,6 +1,6 @@
 # 🤖 AI Wallet Manager — Stellar Blockchain
 
-> **Rise In — Stellar Journey to Mastery | 🟢 Green Belt (Level 4) Submission**
+> **Rise In — Stellar Journey to Mastery | Level 5 Growth & Product Iteration Submission**
 
 ![CI/CD Pipeline](https://github.com/Om12345-ingle/ai-wallet-manager/actions/workflows/ci.yml/badge.svg)
 
@@ -23,10 +23,39 @@ An AI-powered wallet management application built on the **Stellar blockchain**,
 
 **[https://omyaingle.vercel.app](https://omyaingle.vercel.app)**
 
-This release integrates Vercel Web Analytics, Speed Insights, first-run
-onboarding, and an in-product feedback form. The existing production deployment
-is online; the current local readiness update must be published before those
-new additions appear at the live URL.
+The production deployment is online with Vercel Web Analytics, Speed Insights,
+guided onboarding, an in-product feedback flow, and real-ledger activity proof.
+
+## Level 5 Submission Hub
+
+| Requirement | Evidence |
+|---|---|
+| Public repository | [Om12345-ingle/ai-wallet-manager](https://github.com/Om12345-ingle/ai-wallet-manager) |
+| Live application | [omyaingle.vercel.app](https://omyaingle.vercel.app) |
+| Professional pitch deck | [Download the Level 5 PPT](docs/AI-Wallet-Manager-Level-5-Pitch.pptx) |
+| User feedback workbook | [Download the Excel workbook](docs/level-5-user-feedback.xlsx) |
+| Growth and iteration plan | [Level 5 growth plan](docs/LEVEL5_GROWTH_PLAN.md) |
+| Analytics screenshot | [Monitoring evidence](docs/screenshots/05-feedback-monitoring.png) |
+| Transaction activity | [Activity Proof screenshot](docs/screenshots/07-level5-activity-proof.png), in-app explorer links, and [interaction CSV template](docs/user-wallet-interactions.csv) |
+| Demo video | Pending the real 50-wallet study and final recording; [recording script](docs/DEMO_SCRIPT.md) |
+
+The Google Forms step was intentionally skipped at the project owner's request.
+The Excel workbook is ready for manual entry/import of consented responses and
+contains formula-driven analysis. No response or wallet interaction is fabricated.
+
+## Level 5 Product Improvements
+
+The release turns reviewer feedback about onboarding clarity and evidence into
+two shipped improvements:
+
+- **Watch-only onboarding:** reviewers can inspect a wallet with only its public
+  address; signing remains restricted to Freighter or explicit testnet credentials.
+- **Activity Proof workspace:** live Horizon data is measured against the
+  50-interaction goal and the 2–3 minute interval rule, with Stellar Expert links
+  and judge-ready CSV export.
+
+The exact implementation commit link will be added here immediately after the
+owner-authored release commit is created.
 
 ## Product Evidence
 
@@ -42,6 +71,7 @@ Additional evidence:
 
 - [Mobile connected dashboard](docs/screenshots/03-mobile-dashboard.png)
 - [Verified feedback receipt](docs/screenshots/06-feedback-receipt.png)
+- [Level 5 on-chain Activity Proof](docs/screenshots/07-level5-activity-proof.png)
 - [Production readiness matrix](docs/PRODUCTION_READINESS.md)
 - [Consent-based wallet interaction template](docs/user-wallet-interactions.csv)
 - [Live demo recording script](docs/DEMO_SCRIPT.md)
@@ -63,7 +93,7 @@ google docs link - https://docs.google.com/spreadsheets/d/1Fy0MHt8JeNQrlyHyKJqUP
 
 ---
 
-## ✅ Tests — 52 Passing
+## ✅ Tests — 54 Passing
 
 ```
  PASS  __tests__/command-parser.test.ts
@@ -71,7 +101,7 @@ google docs link - https://docs.google.com/spreadsheets/d/1Fy0MHt8JeNQrlyHyKJqUP
  PASS  __tests__/wallet-api.test.ts
 
 Test Suites: 3 passed, 3 total
-Tests:       52 passed, 52 total
+Tests:       54 passed, 54 total
 Snapshots:   0 total
 Time:        5.8 s
 ```
@@ -251,7 +281,7 @@ Push to main
 │  1. Checkout code   │
 │  2. Install deps    │
 │  3. TypeScript check│
-│  4. Run 52 tests    │
+│  4. Run 54 tests    │
 │  5. Production build│
 └──────────┬──────────┘
            │ (on success)
@@ -361,8 +391,8 @@ NEXT_PUBLIC_MULTI_ASSET_CONTRACT_ID=CAVYUCHMTSTCRMBKHLWPNBK73BWMTSBU3CDE3EMVDSRN
 - [x] Level 2 — Multi-wallet flows + smart contract integration
 - [x] Level 3 — Complete mini dApp with swap and portfolio
 - [x] Level 4 — Advanced smart contracts + production + CI/CD + reviewer fixes
-- [ ] Level 5 — Ship MVP + onboard first 5 real users
-- [ ] Level 6 — Scale to 20 users + Demo Day
+- [ ] Level 5 — Complete the genuine 50-wallet validation study and publish the demo video
+- [ ] Level 6 — Retention cohorts, ecosystem partnerships and mainnet readiness
 
 ---
 
